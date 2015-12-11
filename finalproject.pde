@@ -8,12 +8,22 @@ boolean DEBUG = false;
 color textcol = color(0,0,0);
 color bcol1 = color(100,1,1);
 color bcol2 = color(200,100,100);
-
+color filtOnCol     = color(44,32,147);
+color filtOffCol    = color(44,32,67);
+color filtActiveCol = color(84,52,87);
+// our controller, for filter/school/slider changes
+// additionally, that's where the school & filter classes are
+// It's a little confusing since, controlP5 uses the same name for it's
+// event handler. Oops.
 VController controller = new VController();
 
+// whether there are updates pending (each window get a flag)
 boolean updateForMain = false;
 boolean updateForDetailed = false;
 boolean updateForControlView = false;
+
+// for mouse click and drag
+boolean dragflag = false;
 
 void setup() {
   
@@ -54,12 +64,32 @@ void setup() {
      /**** INITIALIZING FILTER BUTTONS ******/
      distance = (width - 60)/controller.filters.length;
      buttonwidth = (int)(distance*0.85);
+     CallbackListener onclickfilt = new CallbackListener() {
+       public void controlEvent( CallbackEvent theEvent ) {
+         dragflag = false;
+       }
+     };
+     CallbackListener onreleasefilt = new CallbackListener() {
+       public void controlEvent( CallbackEvent theEvent ) {
+         if ( !dragflag ) {
+           // I promise this cast is safe (we only use buttons)
+           // if we put another controller in the filter class
+           // we'd have a problem...
+           Button fbut = (Button) theEvent.getController();
+           int index = controller.getFilterIndex( fbut );
+           controller.toggleFilter(index);
+         }
+       }
+     };
+     
      CallbackListener ondrag = new CallbackListener() {
        public void controlEvent( CallbackEvent theEvent ) {
+         dragflag = true;
          Controller fbut = theEvent.getController();
          fbut.setPosition(mouseX-(fbut.getWidth()/2), mouseY-(fbut.getHeight()/2));
        }
      };
+     // draggable filter buttons 
      CallbackListener ondragend = new CallbackListener() {
        public void controlEvent( CallbackEvent theEvent ) {
          int distance = (width - 60)/controller.filters.length;
@@ -72,8 +102,8 @@ void setup() {
            // if this filter button is within the x bounds of a filter location
            if ( mouseX > leftx && mouseX < leftx + buttonwidth ) {
              foundLocation = true;
-             //fbut.setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.5));
-             if ( i != currindex ) { controller.swapFilters(i, currindex); }
+             //if ( i != currindex ) { controller.swapFilters(i, currindex); }
+             controller.swapFilters(i, currindex);
            }
          }
          if ( !foundLocation ) { 
@@ -86,11 +116,12 @@ void setup() {
        controller.filters[i].linkButton(
          cp5.addButton(controller.filters[i].getDisplayName())
            .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.5))
-           .setSwitch(true)
-           .setOn()
            .setSize(buttonwidth,20)
            .onDrag(ondrag)
-           .onEndDrag(ondragend));
+           .onEndDrag(ondragend)
+           .onClick(onclickfilt)
+           .setColorBackground( filtOnCol )
+           .onRelease(onreleasefilt));
      }
   // reposition the Label for controller 'slider'
   //cp5.getController("slider").getValueLabel().align(ControlP5.CENTER, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);
@@ -110,14 +141,28 @@ void draw() {
     update();
   }
   background(255); 
+  int distance = (width - 60)/controller.filters.length;
+  int buttonwidth = (int)(distance*0.85);
+  for( int i = 0 ; i < controller.filters.length ; i++ ) {
+         fill(128);
+         stroke(100);
+         rect((distance*0.07) + 28 + i*distance,(height * 0.5) - 2, buttonwidth + 4, 24);
+  }
 }
 
 void update() {
   int distance = (width - 60)/controller.filters.length;
   int buttonwidth = (int)(distance*0.85);
   for( int i = 0 ; i < controller.filters.length ; i++ ) {
-         controller.filters[i].fbutton
-         .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.5));
+    color fcol;
+    if ( controller.filters[i].isChecked() ) {
+      fcol = filtOnCol;
+    } else {
+      fcol = filtOffCol; 
+    }
+    controller.filters[i].fbutton
+     .setColorBackground(fcol)
+     .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.5));
   }
   updateForControlView = false;   
 }

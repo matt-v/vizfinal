@@ -83,8 +83,8 @@ public class MainView extends PApplet {
           }
           float delta      = scaledVal2 - scaledVal1;
           bezier(left,  height - (botMar+scaledVal1), 
-              left+distance*0.25, height - (botMar+scaledVal1+delta), 
-              left+distance*0.75, height - (botMar+scaledVal2-delta), 
+              left+distance*0.35, height - (botMar+scaledVal1+delta), 
+              left+distance*0.65, height - (botMar+scaledVal2-delta), 
               left+distance, height - (botMar+scaledVal2) );
         } catch (Exception ex) {
           if (DEBUG) println("No data for " + schools[i].name + " for field " + filters[j].getQName());
