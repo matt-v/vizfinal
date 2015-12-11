@@ -44,7 +44,7 @@ public class School {
   boolean isChecked() { return checked; }
 }
 
-class Controller {
+class VController {
 
     Filter [] filters = new Filter[]
     { new Filter ("Mid SAT"   , "admissions.sat_scores.average.overall", 1, true),
@@ -82,7 +82,7 @@ class Controller {
 
     JSONObject json = null; // Data from query
     
-    Controller() {
+    VController() {
       update();
     }
     
@@ -93,6 +93,9 @@ class Controller {
     // This changes the position of the filters in the arrary... their order in the array is their
     // order in the main view
     void swapFilters ( int fst, int snd ) {
+      Button tbut = filtButs[fst];
+      filtButs[fst] = filtButs[snd];
+      filtButs[snd] = tbut;
       Filter temp = filters[fst];
       filters[fst] = filters[snd];
       filters[snd] = temp;
