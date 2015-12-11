@@ -181,8 +181,8 @@ class VController {
           }
         }
       }
-      println("ERROR IN VALUEFOR()");
-      return -1;
+      println("ERROR IN VALUEFOR() "+ id+ " in " + year);
+      return MAX_FLOAT;
     }
     float [] lowAndHighFor( School [] activeSchools, Filter filt ) {
       ArrayList<String> ids = new ArrayList<String>();
@@ -197,10 +197,11 @@ class VController {
                   if (DEBUG) println("No value for " + activeSchools[i].id + " in " + years[j] +"."+ filt.getQName());
                   continue;
                 }
-                if ( candidate > highVal ) {
+                if ( candidate == MAX_FLOAT ) { continue; }
+                else if ( candidate > highVal ) {
                   highVal = candidate;
                 }
-                if ( candidate < lowVal ) {
+                else if ( candidate < lowVal ) {
                   lowVal = candidate;
                 }
             }
