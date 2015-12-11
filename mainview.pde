@@ -1,6 +1,6 @@
 public class MainView extends PApplet {
-  String [] ids;
-  Filter [] actives;
+  Filter [] filters;
+  School [] schools;
   
   int leftMar   = 100;
   int rightMar  = 100;
@@ -13,8 +13,8 @@ public class MainView extends PApplet {
   color secondary  = color(7,33,190);
   
   public void setup() {
-    ids = controller.getSchoolIds();
-    actives = controller.getActiveFilters();        
+    schools = controller.getActiveSchools();
+    filters = controller.getActiveFilters();        
   }
   
   public void draw() {
@@ -25,56 +25,56 @@ public class MainView extends PApplet {
   }
   
   public void update() {
-    ids = controller.getSchoolIds();
-    actives = controller.getActiveFilters();
+    schools = controller.getActiveSchools();
+    filters = controller.getActiveFilters();
     updateForMain = false; 
   }
   
   void drawDataBars() {
-    float distance = (width - xmargin)  / actives.length;
+    float distance = (width - xmargin)  / filters.length;
     float wide     = distance/4.0;
     float tall     = height - ymargin; 
     strokeWeight(1);
     stroke(primary);
-    for ( int i = 0; i < actives.length ; i++ ) {
+    for ( int i = 0; i < filters.length ; i++ ) {
       // draw the bar
       noFill();
       float left = leftMar + i*distance + wide;
       rect(left, topMar, wide, tall, 22);
       // draw the low and high values
-      float [] vals = controller.lowAndHighFor( actives[i] );
+      float [] vals = controller.lowAndHighFor( schools, filters[i] );
       fill(textcol);
       textAlign(CENTER);
       textSize(14);
       text(vals[1], left+wide/2, topMar-20);
-      text(vals[0]+"\n"+actives[i].getDisplayName(), left+wide/2, topMar+tall+20);
+      text(vals[0]+"\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);
     }
   }
   void drawCurves() {
-    float distance = (width - xmargin)  / actives.length;
+    float distance = (width - xmargin)  / filters.length;
     float start    = leftMar + distance*0.375;
     float tall     = height - ymargin; 
     noFill();
-    for ( int i = 0 ; i < ids.length ; i++ ) {
+    for ( int i = 0 ; i < schools.length ; i++ ) {
       strokeWeight(2);
-      stroke(schoolcols[i]);
-      for ( int j = 0 ; j < actives.length-1 ; j++ ) {
+      stroke(schools[i].col);
+      for ( int j = 0 ; j < filters.length-1 ; j++ ) {
         try {
           float left = start + j*distance;
-          float [] vals1   = controller.lowAndHighFor( actives[j] );
+          float [] vals1   = controller.lowAndHighFor( schools, filters[j] );
           float lowVal1    = vals1[0];
           float highVal1   = vals1[1];
-          float pointVal1  = controller.dataPoint( ids[i], actives[j] );
+          float pointVal1  = controller.dataPoint( schools[i], filters[j] );
           float scaledVal1;
           if ( highVal1 - lowVal1 == 0 ) {
             scaledVal1 = tall/2;
           } else {
             scaledVal1 = tall * (pointVal1 - lowVal1) / (highVal1 - lowVal1);
           }
-          float [] vals2   = controller.lowAndHighFor( actives[j+1] );
+          float [] vals2   = controller.lowAndHighFor( schools, filters[j+1] );
           float lowVal2    = vals2[0];
           float highVal2   = vals2[1];
-          float pointVal2  = controller.dataPoint( ids[i], actives[j+1] );
+          float pointVal2  = controller.dataPoint( schools[i], filters[j+1] );
           float scaledVal2;
           if ( highVal2 - lowVal2 == 0 ) {
             scaledVal2 = tall/2;
@@ -87,7 +87,7 @@ public class MainView extends PApplet {
               left+distance*0.75, height - (botMar+scaledVal2-delta), 
               left+distance, height - (botMar+scaledVal2) );
         } catch (Exception ex) {
-          if (DEBUG) println("No data for " + ids[i] + " for field " + actives[j].getQName());
+          if (DEBUG) println("No data for " + schools[i].name + " for field " + filters[j].getQName());
         }
       } // end for j
     } // end for i

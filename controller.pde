@@ -33,9 +33,11 @@ public class Filter {
 public class School {
   String name, id;
   boolean checked;
-  School(String name, String id, boolean checked) {
+  color col;
+  School(String name, String id, color col, boolean checked) {
     this.name = name;
     this.id = id;
+    this.col = col;
     this.checked = checked;
   }
   void toggle() { checked = !checked; }
@@ -56,25 +58,26 @@ class Controller {
     };
     float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
     int [] years = new int[] {2009, 2010, 2011, 2012, 2013};
+    
     School [] schools = new School[] 
-    { new School ("MIT", "166683", false),
-      new School ("Tufts University", "168148", false),
-      new School ("Bston College", "164924", false),
-      new School ("Boston University", "164988", false),
-      new School ("Brandies University", "165015", false),
-      new School ("Emerson College", "165662", false),
-      new School ("Harvard Univerity", "166027", false),
-      new School ("Northeastern University", "167358", false),
-      new School ("Wellesley College", "168218", false),
+    { new School ("MIT", "166683", color(100,170,106), false),
+      new School ("Tufts University", "168148",color(179,112,206), false),
+      new School ("Bston College", "164924",color(197,87,127), false),
+      new School ("Boston University", "164988", color(176,154,60), false),
+      new School ("Brandies University", "165015", color(102,187,188),false),
+      new School ("Emerson College", "165662", color(148,217,77), false),
+      new School ("Harvard Univerity", "166027", color(130,134,179),false),
+      new School ("Northeastern University", "167358", color(65,45,110),false),
+      new School ("Wellesley College", "168218", color(200,170,106),false),
       
-      new School ("Amherst College", "164465", false),
-      new School ("Colby College", "161086", false),
-      new School ("Hamilton College", "191515", false),
-      new School ("Middlebury College", "230959", false),
-      new School ("Wesleyan University", "130697", false),
-      new School ("Howard University", "131520", false),
-      new School ("Morehouse College", "140553", false),
-      new School ("Spelman College", "141060", false)
+      new School ("Amherst College", "164465", color(179,212,206), false),
+      new School ("Colby College", "161086", color(197,187,127), false),
+      new School ("Hamilton College", "191515", color(0,154,100), false),
+      new School ("Middlebury College", "230959", color(202,187,128), false),
+      new School ("Wesleyan University", "130697", color(148,17,77), false),
+      new School ("Howard University", "131520", color(130,34,179), false),
+      new School ("Morehouse College", "140553", color(200,170,6), false),
+      new School ("Spelman College", "141060", color(179,12,236), false)
     };
 
     JSONObject json = null; // Data from query
@@ -96,7 +99,8 @@ class Controller {
       nonQueryUpdate();
     }
     
-    float dataPoint( String id, Filter filt ) {
+    float dataPoint( School school, Filter filt ) {
+      String id = school.id;
       String field = filt.getQName();
       int fieldType = filt.getType();
       JSONArray values = controller.json.getJSONArray("results");
@@ -130,6 +134,15 @@ class Controller {
       }
       return flts.toArray(new Filter[0]);
     }
+    
+    School [] getActiveSchools() {
+      ArrayList<School> sc = new ArrayList<School>();
+      for ( int i = 0; i < schools.length; i++ ) {
+        if (schools[i].isChecked()) { sc.add(schools[i]); }
+        }
+        return sc.toArray(new School[0]);
+    }
+    
     String [] getSchoolIds() {
       ArrayList<String> ids = new ArrayList<String>();
       for ( int i = 0; i < schools.length; i++ ) {
@@ -153,18 +166,18 @@ class Controller {
       println("ERROR IN VALUEFOR()");
       return -1;
     }
-    float [] lowAndHighFor( Filter filt ) {
+    float [] lowAndHighFor( School [] activeSchools, Filter filt ) {
       ArrayList<String> ids = new ArrayList<String>();
       float lowVal  = MAX_FLOAT;
       float highVal = MIN_FLOAT;
-      for ( int i = 0; i < schools.length; i++ ) {
-        if (schools[i].isChecked()) { 
+      for ( int i = 0; i < activeSchools.length; i++ ) {
+        //if (schools[i].isChecked()) { 
             for ( int j = 0; j < years.length; j++ ) {
                 float candidate;
                 try {
-                   candidate = valueFor( schools[i].id, years[j], filt );
+                   candidate = valueFor( activeSchools[i].id, years[j], filt );
                 } catch (Exception e) {
-                  if (DEBUG) println("No value for " + schools[i].id + " in " + years[j] +"."+ filt.getQName());
+                  if (DEBUG) println("No value for " + activeSchools[i].id + " in " + years[j] +"."+ filt.getQName());
                   continue;
                 }
                 if ( candidate > highVal ) {
@@ -174,7 +187,7 @@ class Controller {
                   lowVal = candidate;
                 }
             }
-          }
+          //}
       }
       float [] vals = {lowVal, highVal};
       return vals;

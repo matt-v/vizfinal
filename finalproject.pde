@@ -9,14 +9,6 @@ color textcol = color(0,0,0);
 color bcol1 = color(100,1,1);
 color bcol2 = color(200,100,100);
 
-color [] schoolcols = {color(100,170,106),color(179,112,206),color(197,87,127), color(176,154,60),
-                       color(102,187,188),color(148,217,77) ,color(130,134,179),color(65,45,110),
-                       color(200,170,106),color(179,212,206),color(197,187,127),color(0,154,100),
-                       color(202,187,128),color(148,17,77)  ,color(130,34,179),
-                    color(200,170,6),color(179,12,236),color(107,57,107), color(206,104,0),
-                       color(202,187,8),color(48,217,177) ,color(230,104,179),color(65,45,110),
-                       color(200,20,16),color(179,212,206),color(97,107,157)};
-
 boolean updateForMain = false;
 boolean updateForDetailed = false;
 
@@ -39,7 +31,7 @@ void setup() {
       cp5.addButton(controller.schools[i].name)
        .setValue(i)
        .setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.25))
-       .setColorBackground( schoolcols[i] )
+       .setColorBackground( controller.schools[i].col )
        .setSwitch(true)
        .setColorActive(100)
        .setSize(buttonwidth,20)
