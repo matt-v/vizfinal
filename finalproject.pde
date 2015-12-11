@@ -37,11 +37,12 @@ void setup() {
     .setWidth(width-60)
     .setHeight((int)(height*0.15))
     .setRange(controller.years[0], controller.years[controller.years.length-1])
+    .setValue(2010)
     .setDecimalPrecision(0)
     .setSliderMode(Slider.FLEXIBLE);
     
     /**** INITIALIZING SCHOOL BUTTONS ******/
-    CallbackListener clickschool = new CallbackListener() {
+    CallbackListener pressschool = new CallbackListener() {
       public void controlEvent(CallbackEvent theEvent) {
         int schoolindex = (int)theEvent.getController().getValue();
         controller.toggleSchool(schoolindex);
@@ -54,10 +55,10 @@ void setup() {
        .setValue(i)
        .setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.25))
        .setColorBackground( 100 )
-       .setSwitch(true)
+       .setSwitch(true).setOn()
        .setColorActive(controller.schools[i].col)
        .setSize(buttonwidth,20)
-       .onClick(clickschool)
+       .onPress(pressschool)
        ;
      }
      

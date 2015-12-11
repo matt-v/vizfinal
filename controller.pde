@@ -53,7 +53,10 @@ public class School {
 }
 
 class VController {
-
+    float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
+    int [] years = new int[] {2007,2008,2009, 2010, 2011, 2012, 2013};
+    JSONObject json = null; // Data from query
+  /* should be pulling filters and schools from cvs ... but this will due in a crunch */
     Filter [] filters = new Filter[]
     { new Filter ("Mid SAT"   , "admissions.sat_scores.average.overall", 1, true),
       new Filter ("Admission rate", "admissions.admission_rate.overall", 2, true),
@@ -64,31 +67,27 @@ class VController {
       new Filter ("Percent with federal loans", "aid.federal_loan_rate", 2, true),
       new Filter ("Percent with Pell grant", "aid.pell_grant_rate", 2, true)
     };
-    float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
-    int [] years = new int[] {2009, 2010, 2011, 2012, 2013};
     
     School [] schools = new School[] 
-    { new School ("MIT", "166683", color(100,170,106), false),
-      new School ("Tufts University", "168148",color(179,112,206), false),
-      new School ("Bston College", "164924",color(197,87,127), false),
-      new School ("Boston University", "164988", color(176,154,60), false),
-      new School ("Brandies University", "165015", color(102,187,188),false),
-      new School ("Emerson College", "165662", color(148,217,77), false),
-      new School ("Harvard Univerity", "166027", color(130,134,179),false),
-      new School ("Northeastern University", "167358", color(65,45,110),false),
-      new School ("Wellesley College", "168218", color(200,170,106),false),
+    { new School ("MIT", "166683", color(100,170,106), true),
+      new School ("Tufts University", "168148",color(179,112,206), true),
+      new School ("Bston College", "164924",color(197,87,127), true),
+      new School ("Boston University", "164988", color(176,154,60), true),
+      new School ("Brandies University", "165015", color(102,187,188),true),
+      new School ("Emerson College", "165662", color(148,217,77), true),
+      new School ("Harvard Univerity", "166027", color(130,134,179),true),
+      new School ("Northeastern University", "167358", color(65,45,110),true),
+      new School ("Wellesley College", "168218", color(200,170,106),true),
       
-      new School ("Amherst College", "164465", color(179,212,206), false),
-      new School ("Colby College", "161086", color(197,187,127), false),
-      new School ("Hamilton College", "191515", color(0,154,100), false),
-      new School ("Middlebury College", "230959", color(202,187,128), false),
-      new School ("Wesleyan University", "130697", color(148,17,77), false),
-      new School ("Howard University", "131520", color(130,34,179), false),
-      new School ("Morehouse College", "140553", color(200,170,6), false),
-      new School ("Spelman College", "141060", color(179,12,236), false)
+      new School ("Amherst College", "164465", color(179,212,206), true),
+      new School ("Colby College", "161086", color(197,187,127), true),
+      new School ("Hamilton College", "191515", color(0,154,100), true),
+      new School ("Middlebury College", "230959", color(202,187,128), true),
+      new School ("Wesleyan University", "130697", color(148,17,77), true),
+      new School ("Howard University", "131520", color(130,34,179), true),
+      new School ("Morehouse College", "140553", color(200,170,6), true),
+      new School ("Spelman College", "141060", color(179,12,236), true)
     };
-
-    JSONObject json = null; // Data from query
     
     VController() {
       update();
