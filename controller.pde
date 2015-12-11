@@ -6,6 +6,7 @@ public class Filter {
   // 2  = 2
   private int     fieldtype;
   private boolean checked;
+  Button fbutton = null;
   
   Filter( String displayname, String fieldname, int fieldtype, boolean checked ) {
     this.displayname = displayname;
@@ -18,6 +19,13 @@ public class Filter {
   String getDisplayName() { return displayname; }
   String getQName()       { return fieldname;   }
   int getType()           { return fieldtype;   }
+  
+  void linkButton( Button fbutton ) {
+   if ( this.fbutton == null ) this.fbutton = fbutton;
+   else { println("Cant relink button! " + fieldname); System.exit(-1); }
+  }
+  Button getButton() { return fbutton; }
+  
   
   String getQueryForYears (int [] years ) {
     String qString = "";
@@ -93,13 +101,21 @@ class VController {
     // This changes the position of the filters in the arrary... their order in the array is their
     // order in the main view
     void swapFilters ( int fst, int snd ) {
-      Button tbut = filtButs[fst];
-      filtButs[fst] = filtButs[snd];
-      filtButs[snd] = tbut;
       Filter temp = filters[fst];
       filters[fst] = filters[snd];
       filters[snd] = temp;
       nonQueryUpdate();
+    }
+    
+    int getFilterIndex( Controller b ) {
+      for( int i = 0; i < filters.length; i++ ) {
+        if ( filters[i].getButton() == b ) {
+          return i;
+        }
+      }
+      println("Couldn't find button linked to filter");
+      System.exit(-1);
+      return -1;
     }
     
     float dataPoint( School school, Filter filt ) {
@@ -174,7 +190,6 @@ class VController {
       float lowVal  = MAX_FLOAT;
       float highVal = MIN_FLOAT;
       for ( int i = 0; i < activeSchools.length; i++ ) {
-        //if (schools[i].isChecked()) { 
             for ( int j = 0; j < years.length; j++ ) {
                 float candidate;
                 try {
@@ -190,7 +205,6 @@ class VController {
                   lowVal = candidate;
                 }
             }
-          //}
       }
       float [] vals = {lowVal, highVal};
       return vals;
@@ -208,8 +222,9 @@ class VController {
     }
     
     void nonQueryUpdate() {
-      updateForMain     = true;
-      updateForDetailed = true;
+      updateForMain        = true;
+      updateForDetailed    = true;
+      updateForControlView = true;
     }
     
     void update() {
