@@ -6,8 +6,7 @@ ControlP5 cp5;
 boolean DEBUG = false;
 
 color textcol = color(0,0,0);
-color bcol1 = color(100,1,1);
-color bcol2 = color(200,100,100);
+color backgroundcol = color(245,245,245);
 color filtOnCol     = color(44,32,147);
 color filtOffCol    = color(44,32,67);
 color filtActiveCol = color(84,52,87);
@@ -132,16 +131,13 @@ void setup() {
   new PFrame(new DetailedView(),0,(int)(displayHeight*0.02),displayWidth,(int)(displayHeight*0.27) ); 
   new PFrame(new MainView(),    0,(int)(displayHeight*0.30),displayWidth,(int)(displayHeight*0.30) );
   
-  //println(controller.json);
-  //JSONArray values = controller.json.getJSONArray("results");
-  //JSONObject results = values.getJSONObject(0);
 }
 
 void draw() {
   if ( updateForControlView ) {
     update();
   }
-  background(255); 
+  background(backgroundcol); 
   int distance = (width - 60)/controller.filters.length;
   int buttonwidth = (int)(distance*0.85);
   for( int i = 0 ; i < controller.filters.length ; i++ ) {

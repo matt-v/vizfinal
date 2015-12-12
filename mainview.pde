@@ -19,7 +19,7 @@ public class MainView extends PApplet {
   
   public void draw() {
     if (updateForMain) update();
-    background(255);
+    background(backgroundcol);
     drawDataBars();
     drawCurves();
   }
@@ -28,6 +28,20 @@ public class MainView extends PApplet {
     schools = controller.getActiveSchools();
     filters = controller.getActiveFilters();
     updateForMain = false; 
+  }
+  
+  void mouseClicked() {
+    float distance = (width - xmargin)  / filters.length;
+    float wide     = distance/4.0;
+    float tall     = height - ymargin;
+    for ( int i = 0; i < filters.length ; i++ ) {
+      float left = leftMar + i*distance + wide;
+      if ( mouseX > left && mouseX < left+wide
+        && mouseY > topMar && mouseY < topMar+tall) {
+          controller.selectedFilter[0] = i;
+          updateForDetailed = true;
+        }
+    }
   }
   
   void drawDataBars() {
