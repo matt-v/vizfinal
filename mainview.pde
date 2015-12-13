@@ -15,8 +15,7 @@ public class MainView extends PApplet {
   boolean useDataLess = true;
   
   public void setup() {
-    schools = controller.getActiveSchools();
-    filters = controller.getActiveFilters();        
+    update();    
   }
   
   public void draw() {
@@ -27,25 +26,21 @@ public class MainView extends PApplet {
   }
   
   public void update() {
-    schools = controller.getActiveSchools();
-    filters = controller.getActiveFilters();
+    schools  = controller.getActiveSchools();
+    filters  = controller.getActiveFilters();
+    if (!useDataLess) filters = dataFullFilters(); 
     updateForMain = false; 
   }
   
   void mouseClicked() {
-    // only use filters for which data exists
-    Filter [] dfilters = filters;
-    if (!useDataLess) {
-      dfilters = dataFullFilters();
-    }
-    float distance = (width - xmargin)  / dfilters.length;
+    float distance = (width - xmargin)  / filters.length;
     float wide     = distance/4.0;
     float tall     = height - ymargin;
-    for ( int i = 0; i < dfilters.length ; i++ ) {
+    for ( int i = 0; i < filters.length ; i++ ) {
       float left = leftMar + i*distance + wide;
       if ( mouseX > left && mouseX < left+wide
         && mouseY > topMar && mouseY < topMar+tall) {
-          controller.selectedFilters[controller.next] = controller.getFilterIndex(dfilters[i]);
+          controller.selectedFilters[controller.next] = controller.getFilterIndex(filters[i]);
           controller.next++;
           if ( controller.next >= controller.selectedFilters.length ) {
             controller.next = 0;
@@ -64,17 +59,13 @@ public class MainView extends PApplet {
     return datafull.toArray(new Filter[0]);
   }
   void drawDataBars() {
-    // only use filters for which data exists
-    Filter [] dfilters = filters;
-    if (!useDataLess) {
-      dfilters = dataFullFilters();
-    }
-    float distance = (width - xmargin)  / dfilters.length;
+
+    float distance = (width - xmargin)  / filters.length;
     float wide     = distance/8.0;
     float tall     = height - ymargin; 
     
     
-    for ( int i = 0; i < dfilters.length ; i++ ) {
+    for ( int i = 0; i < filters.length ; i++ ) {
       // draw the bar
       float left = leftMar + i*distance + 2.5*wide;
       if ( mouseX > left && mouseX < left+wide  ) {
@@ -87,52 +78,48 @@ public class MainView extends PApplet {
       noFill();
       rect(left, topMar, wide, tall, 22);
       // draw the low and high values
-      float [] vals = controller.lowAndHighFor( schools, dfilters[i] );
+      float [] vals = controller.lowAndHighFor( schools, filters[i] );
       fill(textcol);
       textAlign(CENTER);
       textSize(14);
-      if (dfilters[i].getType() == 1) {
+      if (filters[i].getType() == 1) {
         text(((int)vals[1]), left+wide/2, topMar-20);
-        text(((int)vals[0])+"\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
-      } else if (dfilters[i].getType() == 2) {
+        text(((int)vals[0])+"\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+      } else if (filters[i].getType() == 2) {
         text((100*vals[1])+"%", left+wide/2, topMar-20);
-        text((100*vals[0])+"%\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+        text((100*vals[0])+"%\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);
       } else {
         text(vals[1], left+wide/2, topMar-20);
-        text(vals[0]+"\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+        text(vals[0]+"\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);
       }
     }
   }
   void drawCurves() {
-    // only use filters for which data exists?
-    Filter [] dfilters = filters;
-    if (!useDataLess) {
-      dfilters = dataFullFilters();
-    }
-    float distance = (width - xmargin)  / dfilters.length;
+
+    float distance = (width - xmargin)  / filters.length;
     float start    = leftMar + distance*0.375;
     float tall     = height - ymargin; 
     noFill();
     for ( int i = 0 ; i < schools.length ; i++ ) {
       strokeWeight(2);
       stroke(schools[i].col);
-      for ( int j = 0 ; j < dfilters.length-1 ; j++ ) {
+      for ( int j = 0 ; j < filters.length-1 ; j++ ) {
         try {
           float left = start + j*distance;
-          float [] vals1   = controller.lowAndHighFor( schools, dfilters[j] );
+          float [] vals1   = controller.lowAndHighFor( schools, filters[j] );
           float lowVal1    = vals1[0];
           float highVal1   = vals1[1];
-          float pointVal1  = controller.dataPoint( schools[i], dfilters[j] );
+          float pointVal1  = controller.dataPoint( schools[i], filters[j] );
           float scaledVal1;
           if ( highVal1 - lowVal1 == 0 ) {
             scaledVal1 = tall/2;
           } else {
             scaledVal1 = tall * (pointVal1 - lowVal1) / (highVal1 - lowVal1);
           }
-          float [] vals2   = controller.lowAndHighFor( schools, dfilters[j+1] );
+          float [] vals2   = controller.lowAndHighFor( schools, filters[j+1] );
           float lowVal2    = vals2[0];
           float highVal2   = vals2[1];
-          float pointVal2  = controller.dataPoint( schools[i], dfilters[j+1] );
+          float pointVal2  = controller.dataPoint( schools[i], filters[j+1] );
           float scaledVal2;
           if ( highVal2 - lowVal2 == 0 ) {
             scaledVal2 = tall/2;
@@ -145,7 +132,7 @@ public class MainView extends PApplet {
               left+distance*0.65, height - (botMar+scaledVal2-delta), 
               left+distance, height - (botMar+scaledVal2) );
         } catch (Exception ex) {
-          if (DEBUG) println("No data for " + schools[i].name + " for field " + dfilters[j].getQName());
+          if (DEBUG) println("No data for " + schools[i].name + " for field " + filters[j].getQName());
         }
       } // end for j
     } // end for i
