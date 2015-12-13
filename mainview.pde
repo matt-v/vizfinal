@@ -84,8 +84,16 @@ public class MainView extends PApplet {
       fill(textcol);
       textAlign(CENTER);
       textSize(14);
-      text(vals[1], left+wide/2, topMar-20);
-      text(vals[0]+"\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+      if (dfilters[i].getType() == 1) {
+        text(((int)vals[1]), left+wide/2, topMar-20);
+        text(((int)vals[0])+"\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+      } else if (dfilters[i].getType() == 2) {
+        text((100*vals[1])+"%", left+wide/2, topMar-20);
+        text((100*vals[0])+"%\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+      } else {
+        text(vals[1], left+wide/2, topMar-20);
+        text(vals[0]+"\n"+dfilters[i].getDisplayName(), left+wide/2, topMar+tall+20);
+      }
     }
   }
   void drawCurves() {
