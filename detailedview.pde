@@ -16,7 +16,7 @@ public class DetailedView extends PApplet {
       initialize(  xmin,  ymin,  xsize,  ysize, filt );      
     }
     
-    void initialize( float xmin, float ymin, float xsize, float ysize, Filter filt) {
+    public void initialize( float xmin, float ymin, float xsize, float ysize, Filter filt) {
       this.xmin = xmin;
       this.ymin = ymin;
       xmax = xmin + xsize;
@@ -28,7 +28,7 @@ public class DetailedView extends PApplet {
       initialized = true;
     }
     
-    void getFiltVals() {
+    private void getFiltVals() {
       activeSchools = controller.getActiveSchools();
       lowHi = controller.lowAndHighFor( activeSchools, filt );
     }
@@ -40,9 +40,10 @@ public class DetailedView extends PApplet {
       popMatrix();
     }
     
-    public void innerdraw() {
+    private void innerdraw() {
       // draw axis
       stroke(153);
+      strokeWeight(1);
       line(xsize * 0.2, ysize - (ysize * 0.2), xsize * 0.2, ysize * 0.2);
       line(xsize * 0.2, ysize - (ysize * 0.2), xsize - (xsize * 0.2), ysize*0.8);
       
@@ -146,6 +147,7 @@ public class DetailedView extends PApplet {
   float leftshift  = 0;
   float topshift = 0;
   int startX, startY;
+  int moveAction = 0; //0 = zoom, 1 = scan
   
   public void setup() {
     size(displayWidth,(int)(displayHeight*0.37));
@@ -154,23 +156,39 @@ public class DetailedView extends PApplet {
   public void mousePressed() {
     startX = mouseX;
     startY = mouseY;
+    if (  25 > sqrt( sq(mouseX - (width - 60)) + sq(mouseY - ((height-22)/2 - 72)))) {
+      moveAction = 0; // zoom
+    } else if (  25 > sqrt( sq(mouseX - (width - 60)) + sq(mouseY - ((height-22) - 92)))) {
+      moveAction = 1; // scan
+    }
   }
   public void mouseDragged() {
     float dx = mouseX - startX;
     float dy = mouseY - startY;
-    leftshift += dx;
-    zoom += dy / 100.0;
+    switch (moveAction) {
+      case 0: 
+        zoom += dy / 100.0; 
+        break;
+      case 1: 
+        leftshift += dx; 
+        topshift += dy; 
+        break;
+      case -1:
+        // do nothing
+        break;
+    }   
     startX = mouseX;
-    startY = mouseY;
+    startY = mouseY; 
   }
   
   public void draw() {
     if ( updateForDetailed ) {
       for ( int i = 0; i < barcharts.length; i++ ) {
         if  ( controller.selectedFilters[i] != -1 )  {
-          float chartWidth = width/((float) barcharts.length) - 20;
-          barcharts[i].initialize(10 + (i*width/((float) barcharts.length)),
-                0, 
+          float windowSize = width/((float) barcharts.length) - (70 / barcharts.length);
+          float chartWidth = windowSize - 20;
+          barcharts[i].initialize(10 + i*windowSize, 
+                10, 
                 chartWidth, 
                 height-60, 
                 controller.filters[controller.selectedFilters[i]]);
@@ -178,6 +196,7 @@ public class DetailedView extends PApplet {
       }
       updateForDetailed = false;
     }
+    pushMatrix();
     background(backgroundcol);
     translate(leftshift, topshift);
     scale(zoom);
@@ -186,11 +205,57 @@ public class DetailedView extends PApplet {
       if ( barcharts[i].initialized ) {
         barcharts[i].draw();
       } else if  ( controller.selectedFilters[i] != -1 )  {
-        float chartWidth = width/3.0 - 20;
-        barcharts[i].initialize(10 + (i*width/3), 10, chartWidth, height-20, controller.filters[controller.selectedFilters[i]]);
+        float windowSize = width/((float) barcharts.length) - (120 / barcharts.length);
+        float chartWidth = windowSize - 20;
+        barcharts[i].initialize(10 + i*windowSize, 
+              10, 
+              chartWidth, 
+              height-60, 
+              controller.filters[controller.selectedFilters[i]]);
       }
     } // end for
+    popMatrix();
+    drawControls();
     
+  }
+  
+  private void drawControls() {
+    fill( backgroundcol ); 
+    stroke( color(25,0,75));
+    strokeWeight(2);
+    rect(width - 110, 10, 100, height - 20, 10);
+    
+    fill(10,10,10);
+    textSize(27);
+    textAlign(CENTER);
+    text("Zoom", width - 60, (height-22)/2 - 12 );
+    text("Scan", width - 60, (height-22) - 32 );
+    
+    
+    
+    // zoom
+    if ( moveAction == 0 ) { fill(255,255,0); } else { fill(110,70,110); }
+    if (  25 > sqrt( sq(mouseX - (width - 60)) + sq(mouseY - ((height-22)/2 - 72)))) {
+      strokeWeight(2);
+      stroke(10,200,27);
+    } else {
+      strokeWeight(1);
+      stroke(110,78,128);    
+    }
+    ellipse(width - 60, (height-22)/2 - 72, 50, 50 );
+    
+    // scan
+    if ( moveAction == 1) { fill(255,255,0); } else { fill(110,70,110); }
+    if (  25 > sqrt( sq(mouseX - (width - 60)) + sq(mouseY - ((height-22) - 92)))) {
+      strokeWeight(2);
+      stroke(10,200,27);
+    } else {
+      strokeWeight(1);
+      stroke(110,78,128);
+    }  
+    ellipse(width - 60, (height-22)   - 92, 50, 50 );
+    
+       
   }
   
 } 

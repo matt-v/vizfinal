@@ -112,6 +112,8 @@ void setup() {
        }
      };
           
+     /* link buttons to filters, so the controller knows what buttons need to move
+      * with what fitler when they're dragged */     
      for( int i = 0 ; i < controller.filters.length ; i++ ) {
        controller.filters[i].linkButton(
          cp5.addButton(controller.filters[i].getDisplayName())
@@ -169,6 +171,7 @@ void slider(float val) {
 }
 
 
+/* makes additional windows */
 public class PFrame extends JFrame {
   public PFrame(PApplet s, int left, int top, int w, int h) {
     setBounds(left, top, w, h);

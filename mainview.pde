@@ -50,14 +50,14 @@ public class MainView extends PApplet {
   
   void drawDataBars() {
     float distance = (width - xmargin)  / filters.length;
-    float wide     = distance/4.0;
+    float wide     = distance/8.0;
     float tall     = height - ymargin; 
     strokeWeight(1);
     stroke(primary);
     for ( int i = 0; i < filters.length ; i++ ) {
       // draw the bar
       noFill();
-      float left = leftMar + i*distance + wide;
+      float left = leftMar + i*distance + 2.5*wide;
       rect(left, topMar, wide, tall, 22);
       // draw the low and high values
       float [] vals = controller.lowAndHighFor( schools, filters[i] );

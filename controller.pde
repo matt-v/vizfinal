@@ -2,8 +2,8 @@ public class Filter {
   private String  displayname;
   private String  fieldname;
   /* field types */
-  // 1    = 1
-  // 2  = 2
+  // INT   = 1
+  // FLOAT = 2
   private int     fieldtype;
   private boolean checked;
   Button fbutton = null;
@@ -214,7 +214,7 @@ class VController {
                 float candidate;
                 try {
                    candidate = valueFor( activeSchools[i].id, years[j], filt );
-                } catch (Exception e) {
+                } catch (Exception ex) {
                   if (DEBUG) println("No value for " + activeSchools[i].id + " in " + years[j] +"."+ filt.getQName());
                   continue;
                 }
