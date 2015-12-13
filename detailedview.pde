@@ -73,7 +73,10 @@ public class DetailedView extends PApplet {
         text( vallab, xsize * 0.15, ysize * 0.8 - (i * ysize * 0.6 / ticks) );
       }
       
-      // draw bars
+      /*******   draw bars    ******/
+      // mouse location adjusted for scan and zoom
+      float transX = (mouseX - leftshift) / zoom ; 
+      float transY = (mouseY - topshift) / zoom ;
       xstart = xstart + (barsize/4);
       for ( int i = 0; i < activeSchools.length; i++ ) {
         float xloc = xstart + xdistance * i;
@@ -87,8 +90,8 @@ public class DetailedView extends PApplet {
           ysize = 0;
         }
         //if mouse over this bar
-        if ( mouseX >= xmin + xloc && mouseX <= xmin + xloc + barsize 
-          && mouseY >= ystart + ysize && mouseY <= ystart ) {
+        if ( transX >= xmin + xloc && transX <= xmin + xloc + barsize 
+          && transY >= ystart + ysize && transY <= ystart ) {
           fill( color(255,255,0) );  
         } else {
           fill( activeSchools[i].col );
@@ -108,8 +111,8 @@ public class DetailedView extends PApplet {
           ysize = 0;
         }
         //if mouse over this bar
-        if ( mouseX >= xmin + xloc && mouseX <= xmin + xloc + barsize 
-          && mouseY >= ystart + ysize && mouseY <= ystart ) {
+        if ( transX >= xmin + xloc && transX <= xmin + xloc + barsize 
+          && transY >= ystart + ysize && transY <= ystart ) {
             String valuepair = "(" + activeSchools[i].name + ",";
             if (datapoint == MIN_FLOAT) {
               valuepair += "value not in data" +")";  
