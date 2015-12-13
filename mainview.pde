@@ -72,12 +72,19 @@ public class MainView extends PApplet {
     float distance = (width - xmargin)  / dfilters.length;
     float wide     = distance/8.0;
     float tall     = height - ymargin; 
-    strokeWeight(1);
-    stroke(primary);
+    
+    
     for ( int i = 0; i < dfilters.length ; i++ ) {
       // draw the bar
-      noFill();
       float left = leftMar + i*distance + 2.5*wide;
+      if ( mouseX > left && mouseX < left+wide  ) {
+        strokeWeight(2);
+        stroke(255,255,0);
+      } else {
+        strokeWeight(1);
+        stroke(primary);
+      }
+      noFill();
       rect(left, topMar, wide, tall, 22);
       // draw the low and high values
       float [] vals = controller.lowAndHighFor( schools, dfilters[i] );

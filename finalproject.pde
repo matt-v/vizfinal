@@ -6,7 +6,7 @@ ControlP5 cp5;
 boolean DEBUG = false;
 
 color textcol = color(0,0,0);
-color backgroundcol = color(245,245,245);
+color backgroundcol = color(249,249,249);
 color filtOnCol     = color(44,32,147);
 color filtOffCol    = color(44,32,67);
 color filtActiveCol = color(84,52,87);

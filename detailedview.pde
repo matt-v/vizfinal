@@ -68,7 +68,10 @@ public class DetailedView extends PApplet {
       int ticks = 5;
       for( int i = 0; i <= ticks; i++ ) {
         float val = i * lowHi[1] / ticks;
-        String vallab = "" + val;
+        String vallab = ""; 
+        if       ( filt.getType() == 1 )  { vallab += ((int) val);      }
+        else if  ( filt.getType() == 2)   { vallab += ((int) (val*100)) + "%";  }
+        else                              { vallab += val;              }
         textSize(13); 
         text( vallab, xsize * 0.15, ysize * 0.8 - (i * ysize * 0.6 / ticks) );
       }
