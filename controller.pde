@@ -202,7 +202,7 @@ class VController {
           }
         }
       }
-      println("ERROR IN VALUEFOR() "+ id+ " in " + year);
+      if (DEBUG) println("ERROR IN VALUEFOR() "+ id+ " in " + year);
       return MAX_FLOAT;
     }
     float [] lowAndHighFor( School [] activeSchools, Filter filt ) {

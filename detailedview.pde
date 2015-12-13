@@ -142,6 +142,10 @@ public class DetailedView extends PApplet {
     new BarChart(), new BarChart(), new BarChart()
   };
   
+  float zoom       = 1;
+  float leftshift  = 0;
+  float rightshift = 0;
+  
   public void setup() {
     size(displayWidth,(int)(displayHeight*0.37));
   }
@@ -161,12 +165,15 @@ public class DetailedView extends PApplet {
       updateForDetailed = false;
     }
     background(backgroundcol);
+    translate(leftshift, rightshift);
+    scale(zoom);
+    
     for ( int i = 0; i < barcharts.length; i++ ) {
       if ( barcharts[i].initialized ) {
         barcharts[i].draw();
       } else if  ( controller.selectedFilters[i] != -1 )  {
         float chartWidth = width/3.0 - 20;
-        barcharts[i].initialize(10 + (i*width/3), 10, chartWidth ,height-20, controller.filters[controller.selectedFilters[i]]);
+        barcharts[i].initialize(10 + (i*width/3), 10, chartWidth, height-20, controller.filters[controller.selectedFilters[i]]);
       }
     } // end for
     
