@@ -150,8 +150,12 @@ public class DetailedView extends PApplet {
     if ( updateForDetailed ) {
       for ( int i = 0; i < barcharts.length; i++ ) {
         if  ( controller.selectedFilters[i] != -1 )  {
-          float chartWidth = width/3.0 - 20;
-          barcharts[i].initialize(10 + (i*width/3), 0, chartWidth ,height-60, controller.filters[controller.selectedFilters[i]]);
+          float chartWidth = width/((float) barcharts.length) - 20;
+          barcharts[i].initialize(10 + (i*width/((float) barcharts.length)),
+                0, 
+                chartWidth, 
+                height-60, 
+                controller.filters[controller.selectedFilters[i]]);
         }
       }
       updateForDetailed = false;
