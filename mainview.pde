@@ -12,6 +12,8 @@ public class MainView extends PApplet {
   color primary    = color(7,33,190);
   color secondary  = color(7,33,190);
   
+  boolean useDataLess = true;
+  
   public void setup() {
     schools = controller.getActiveSchools();
     filters = controller.getActiveFilters();        
@@ -32,7 +34,10 @@ public class MainView extends PApplet {
   
   void mouseClicked() {
     // only use filters for which data exists
-    Filter [] dfilters = dataFullFilters();
+    Filter [] dfilters = filters;
+    if (!useDataLess) {
+      dfilters = dataFullFilters();
+    }
     float distance = (width - xmargin)  / dfilters.length;
     float wide     = distance/4.0;
     float tall     = height - ymargin;
@@ -60,7 +65,10 @@ public class MainView extends PApplet {
   }
   void drawDataBars() {
     // only use filters for which data exists
-    Filter [] dfilters = dataFullFilters();
+    Filter [] dfilters = filters;
+    if (!useDataLess) {
+      dfilters = dataFullFilters();
+    }
     float distance = (width - xmargin)  / dfilters.length;
     float wide     = distance/8.0;
     float tall     = height - ymargin; 
@@ -81,8 +89,11 @@ public class MainView extends PApplet {
     }
   }
   void drawCurves() {
-    // only use filters for which data exists
-    Filter [] dfilters = dataFullFilters();
+    // only use filters for which data exists?
+    Filter [] dfilters = filters;
+    if (!useDataLess) {
+      dfilters = dataFullFilters();
+    }
     float distance = (width - xmargin)  / dfilters.length;
     float start    = leftMar + distance*0.375;
     float tall     = height - ymargin; 
