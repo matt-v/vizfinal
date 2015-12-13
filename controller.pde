@@ -127,6 +127,7 @@ class VController {
       System.exit(-1);
       return -1;
     }
+    // used for getting overall filter index for an active filter
     int getFilterIndex( Filter filt ) {
       for ( int i = 0; i < filters.length ; i++ ) {
         if ( filters[i].fieldname == filt.fieldname ) {
@@ -204,6 +205,24 @@ class VController {
       }
       if (DEBUG) println("ERROR IN VALUEFOR() "+ id+ " in " + year);
       return MAX_FLOAT;
+    }
+    boolean schoolsHaveData( School [] activeSchools, Filter filt ) {
+      int lowYear  = (int) floor(selectedYear);
+      int highYear = (int) ceil(selectedYear);
+      for ( int aci = 0; aci < activeSchools.length; aci++ ) {
+        String id = activeSchools[aci].id;
+        JSONArray results = controller.json.getJSONArray("results");
+        for ( int i = 0 ; i < results.size(); i++ ) {
+          JSONObject record = results.getJSONObject(i);
+          if ( parseInt(id) == record.getInt("id") ) {
+            if ( !record.isNull(lowYear +"."+ filt.getQName()) 
+              && !record.isNull(highYear + "." + filt.getQName())) {
+                return true;
+            }
+          }
+        }
+      }
+      return false;
     }
     float [] lowAndHighFor( School [] activeSchools, Filter filt ) {
       ArrayList<String> ids = new ArrayList<String>();

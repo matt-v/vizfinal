@@ -169,8 +169,8 @@ public class DetailedView extends PApplet {
     float dx = mouseX - startX;
     float dy = mouseY - startY;
     switch (moveAction) {
-      case 0: 
-        zoom += dy / 100.0; 
+      case 0:  
+        zoom += dy / 100.0;
         break;
       case 1: 
         leftshift += dx; 
@@ -201,8 +201,11 @@ public class DetailedView extends PApplet {
     }
     pushMatrix();
     background(backgroundcol);
-    translate(leftshift, topshift);
     scale(zoom);
+    // translation with a centered zoom
+    translate(leftshift - (zoom-1)*width/(zoom*2), 
+               topshift - (zoom-1)*height/(zoom*2));
+    
     
     for ( int i = 0; i < barcharts.length; i++ ) {
       if ( barcharts[i].initialized ) {
