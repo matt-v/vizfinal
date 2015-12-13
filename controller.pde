@@ -102,6 +102,15 @@ class VController {
     // This changes the position of the filters in the arrary... their order in the array is their
     // order in the main view
     void swapFilters ( int fst, int snd ) {
+      for ( int i = 0 ; i < selectedFilters.length ; i++ ) {
+        if ( selectedFilters[i] == fst ) selectedFilters[i] = -2;
+      }
+      for ( int i = 0 ; i < selectedFilters.length ; i++ ) {
+        if ( selectedFilters[i] == snd ) selectedFilters[i] = fst;
+      }
+      for ( int i = 0 ; i < selectedFilters.length ; i++ ) {
+        if ( selectedFilters[i] == -2 ) selectedFilters[i] = snd;
+      }
       Filter temp = filters[fst];
       filters[fst] = filters[snd];
       filters[snd] = temp;
@@ -115,6 +124,16 @@ class VController {
         }
       }
       println("Couldn't find button linked to filter");
+      System.exit(-1);
+      return -1;
+    }
+    int getFilterIndex( Filter filt ) {
+      for ( int i = 0; i < filters.length ; i++ ) {
+        if ( filters[i].fieldname == filt.fieldname ) {
+          return i;
+        }
+      }
+      println("Couldn't filter in filter list");
       System.exit(-1);
       return -1;
     }

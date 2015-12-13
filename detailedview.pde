@@ -56,7 +56,7 @@ public class DetailedView extends PApplet {
       
       float xdistance = xsize * 0.6 / activeSchools.length;
       float xstart = xsize * 0.2;
-      float ydistance = ysize * 0.6 / (lowHi[0] + (lowHi[1] - lowHi[0]));
+      float ydistance = ysize * 0.6 / lowHi[1];
       float ystart = ysize * 0.8;
       float barsize = (xsize * 0.6) / (activeSchools.length * 1.5);
       
@@ -66,7 +66,7 @@ public class DetailedView extends PApplet {
       
       int ticks = 5;
       for( int i = 0; i <= ticks; i++ ) {
-        float val = lowHi[0] + (i * (lowHi[1] - lowHi[0]) / ticks);
+        float val = i * lowHi[1] / ticks;
         String vallab = "" + val;
         textSize(13); 
         text( vallab, xsize * 0.15, ysize * 0.8 - (i * ysize * 0.6 / ticks) );
@@ -77,9 +77,12 @@ public class DetailedView extends PApplet {
       for ( int i = 0; i < activeSchools.length; i++ ) {
         float xloc = xstart + xdistance * i;
         float ysize;
+        float datapoint;
         try {
-          ysize = ydistance * controller.dataPoint(activeSchools[i], filt) * -1;
+          datapoint = controller.dataPoint(activeSchools[i], filt);
+          ysize = ydistance * datapoint * -1;
         } catch (Exception ex) {
+          datapoint = MIN_FLOAT;
           ysize = 0;
         }
         //if mouse over this bar
@@ -91,25 +94,39 @@ public class DetailedView extends PApplet {
         }
         rect(xloc, ystart, barsize, ysize);
       }
-      // second loop so text appears on top
-      /*for ( int i = 0; i < values.length; i++ ) {
+      // second loop so words appear on top
+      for ( int i = 0; i < activeSchools.length; i++ ) {
         float xloc = xstart + xdistance * i;
-        float ysize = ydistance * values[i] * -1;
-        if ( mouseX >= xloc && mouseX <= xloc + barsize 
+        float ysize;
+        float datapoint;
+        try {
+          datapoint = controller.dataPoint(activeSchools[i], filt);
+          ysize = ydistance * datapoint * -1;
+        } catch (Exception ex) {
+          datapoint = MIN_FLOAT;
+          ysize = 0;
+        }
+        //if mouse over this bar
+        if ( mouseX >= xmin + xloc && mouseX <= xmin + xloc + barsize 
           && mouseY >= ystart + ysize && mouseY <= ystart ) {
-          String valuepair = "(" + names[i] + "," + values[i] + ")";
-          fill(10,10,10);
-          textAlign(CENTER);
-          text(valuepair, xloc + barsize/2, ystart + ysize - xdistance/4);
-       }
-      }*/
+            String valuepair = "(" + activeSchools[i].name + ",";
+            if (datapoint == MIN_FLOAT) {
+              valuepair += "value not in data" +")";  
+            } else { 
+              valuepair += datapoint + ")";
+            }
+            fill(10,10,10);
+            textAlign(CENTER);
+            text(valuepair, xloc + barsize/2, ystart + ysize - xdistance/4);
+        }
+      }
       
       // horizontal labels
       fill(10,10,10);
       textAlign(RIGHT);
       for( int i = 0; i < activeSchools.length ; i++ ) {
         float x = xsize * 0.2 + (xdistance * i) + (barsize * 0.75) + 2;
-        float y = ysize *0.88;
+        float y = ysize *0.89;
         pushMatrix();
         translate(x,y);
         rotate(HALF_PI *3);
