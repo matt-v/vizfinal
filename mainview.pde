@@ -38,7 +38,11 @@ public class MainView extends PApplet {
       float left = leftMar + i*distance + wide;
       if ( mouseX > left && mouseX < left+wide
         && mouseY > topMar && mouseY < topMar+tall) {
-          controller.selectedFilter[0] = i;
+          controller.selectedFilters[controller.next] = i;
+          controller.next++;
+          if ( controller.next >= controller.selectedFilters.length ) {
+            controller.next = 0;
+          }
           updateForDetailed = true;
         }
     }

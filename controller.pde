@@ -53,7 +53,8 @@ public class School {
 }
 
 class VController {
-    int [] selectedFilter = new int[] {-1,-1,-1};
+    int [] selectedFilters = new int[] {-1,-1,-1}; // filters for detailed view
+    int next = 0; // index into selected filter
     float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
     int [] years = new int[] {2007,2008,2009, 2010, 2011, 2012, 2013};
     JSONObject json = null; // Data from query

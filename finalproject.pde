@@ -26,7 +26,7 @@ boolean dragflag = false;
 
 void setup() {
   
-  size(displayWidth,(int)(displayHeight*0.25)); 
+  size(displayWidth,(int)(displayHeight*0.20)); 
   smooth();
   cp5 = new ControlP5(this);
   
@@ -128,8 +128,8 @@ void setup() {
   //cp5.getController("slider").getCaptionLabel().align(ControlP5.CENTER, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);  
     
   // Create other views
-  new PFrame(new DetailedView(),0,(int)(displayHeight*0.02),displayWidth,(int)(displayHeight*0.27) ); 
-  new PFrame(new MainView(),    0,(int)(displayHeight*0.30),displayWidth,(int)(displayHeight*0.30) );
+  new PFrame(new DetailedView(),0,(int)(displayHeight*0.02),displayWidth,(int)(displayHeight*0.37) ); 
+  new PFrame(new MainView(),    0,(int)(displayHeight*0.40),displayWidth,(int)(displayHeight*0.30) );
   
 }
 
