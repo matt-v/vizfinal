@@ -144,10 +144,24 @@ public class DetailedView extends PApplet {
   
   float zoom       = 1;
   float leftshift  = 0;
-  float rightshift = 0;
+  float topshift = 0;
+  int startX, startY;
   
   public void setup() {
     size(displayWidth,(int)(displayHeight*0.37));
+  }
+  
+  public void mousePressed() {
+    startX = mouseX;
+    startY = mouseY;
+  }
+  public void mouseDragged() {
+    float dx = mouseX - startX;
+    float dy = mouseY - startY;
+    leftshift += dx;
+    zoom += dy / 100.0;
+    startX = mouseX;
+    startY = mouseY;
   }
   
   public void draw() {
@@ -165,7 +179,7 @@ public class DetailedView extends PApplet {
       updateForDetailed = false;
     }
     background(backgroundcol);
-    translate(leftshift, rightshift);
+    translate(leftshift, topshift);
     scale(zoom);
     
     for ( int i = 0; i < barcharts.length; i++ ) {
