@@ -2,8 +2,8 @@ public class Filter {
   private String  displayname;
   private String  fieldname;
   /* field types */
-  // 1    = 1
-  // 2  = 2
+  // INT   = 1
+  // FLOAT = 2
   private int     fieldtype;
   private boolean checked;
   Button fbutton = null;
@@ -53,6 +53,11 @@ public class School {
 }
 
 class VController {
+    // memoization hashmap
+    HashMap<String, Pair<Float>> lowHighMem = new HashMap<String, Pair<Float> >();
+    HashMap<String, Float> dataPointMem = new HashMap<String, Float >();
+    
+    // controller globals  
     int [] selectedFilters = new int[] {-1,-1,-1}; // filters for detailed view
     int next = 0; // index into selected filter
     float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
@@ -127,6 +132,7 @@ class VController {
       System.exit(-1);
       return -1;
     }
+    // used for getting overall filter index for an active filter
     int getFilterIndex( Filter filt ) {
       for ( int i = 0; i < filters.length ; i++ ) {
         if ( filters[i].fieldname == filt.fieldname ) {
@@ -142,6 +148,13 @@ class VController {
       String id = school.id;
       String field = filt.getQName();
       int fieldType = filt.getType();
+      
+      // check if we have this memoized
+      String idString = id + field + selectedYear;
+      if ( dataPointMem.containsKey(idString) ) {
+        return dataPointMem.get(idString);
+      }     
+      
       JSONArray values = controller.json.getJSONArray("results");
       for ( int i = 0 ; i < values.size() ; i++ ) {
         JSONObject fields = values.getJSONObject(i);
@@ -151,18 +164,30 @@ class VController {
             float highYear = ceil(selectedYear);
             float lyval    = fields.getInt(((int)lowYear) +"."+field);
             float hyval    = fields.getInt(((int)highYear)+"."+field); 
-            if (lyval == hyval) return lyval;           
-            return lyval + (hyval-lyval)*(selectedYear - lowYear)/(highYear - lowYear);
+            if (lyval == hyval) { 
+               dataPointMem.put(idString, lyval); 
+               return lyval;
+            }
+            float result = lyval + (hyval-lyval)*(selectedYear - lowYear)/(highYear - lowYear);
+            dataPointMem.put(idString, result);  
+            return result;
           } else if ( fieldType == 2 ) {
             float lowYear  = floor(selectedYear);
             float highYear = ceil(selectedYear);
             float lyval    = fields.getFloat(((int)lowYear)+"."+field);
             float hyval    = fields.getFloat(((int)highYear)+"."+field);
-            if (lyval == hyval) return lyval;            
-            return lyval + (hyval-lyval)*(selectedYear - lowYear)/(highYear - lowYear);
+            if (lyval == hyval) { 
+               dataPointMem.put(idString, lyval); 
+               return lyval;
+            }           
+            float result = lyval + (hyval-lyval)*(selectedYear - lowYear)/(highYear - lowYear);
+            dataPointMem.put(idString, new Float(result)); 
+            return result;
           }
         }
       }
+      if (DEBUG) println("BAD ENTRY INTO DATAPOINT: " + idString );         
+      dataPointMem.put(idString, new Float(-1.0));
       return -1;
     }
     
@@ -191,21 +216,57 @@ class VController {
     }
     /* only for int years, not floating point mid-years */
     float valueFor( String id, int year, Filter filt ) {
+      String idString = id + filt.getQName() + year;
+      if ( dataPointMem.containsKey(idString) ) {
+        return dataPointMem.get(idString);
+      }
       JSONArray results = controller.json.getJSONArray("results");
       for ( int i = 0 ; i < results.size(); i++ ) {
         JSONObject record = results.getJSONObject(i);
         if ( parseInt(id) == record.getInt("id") ) {
           if (filt.getType() == 1) {
-            return record.getInt(year + "." + filt.getQName() );
+            float result = record.getInt(year + "." + filt.getQName() );
+            dataPointMem.put(idString, result);
+            return result;
           } else if (filt.getType() == 2) {
-            return record.getFloat(year + "." + filt.getQName() );
+            float result = record.getFloat(year + "." + filt.getQName() );
+            dataPointMem.put(idString, result);
+            return result;
           }
         }
       }
       if (DEBUG) println("ERROR IN VALUEFOR() "+ id+ " in " + year);
       return MAX_FLOAT;
     }
+    boolean schoolsHaveData( School [] activeSchools, Filter filt ) {
+      int lowYear  = (int) floor(selectedYear);
+      int highYear = (int) ceil(selectedYear);
+      for ( int aci = 0; aci < activeSchools.length; aci++ ) {
+        String id = activeSchools[aci].id;
+        JSONArray results = controller.json.getJSONArray("results");
+        for ( int i = 0 ; i < results.size(); i++ ) {
+          JSONObject record = results.getJSONObject(i);
+          if ( parseInt(id) == record.getInt("id") ) {
+            if ( !record.isNull(lowYear +"."+ filt.getQName()) 
+              && !record.isNull(highYear + "." + filt.getQName())) {
+                return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
     float [] lowAndHighFor( School [] activeSchools, Filter filt ) {
+      String idString = "";
+      for (int i = 0; i < activeSchools.length; i++ ) {
+        idString += activeSchools[i].id;
+      }
+      idString += filt.getQName();
+      if ( lowHighMem.containsKey(idString) ) {
+        Pair<Float> lohi = lowHighMem.get(idString);
+        float [] result = {lohi.fst, lohi.snd};
+        return result; 
+      } 
       ArrayList<String> ids = new ArrayList<String>();
       float lowVal  = MAX_FLOAT;
       float highVal = MIN_FLOAT;
@@ -214,7 +275,7 @@ class VController {
                 float candidate;
                 try {
                    candidate = valueFor( activeSchools[i].id, years[j], filt );
-                } catch (Exception e) {
+                } catch (Exception ex) {
                   if (DEBUG) println("No value for " + activeSchools[i].id + " in " + years[j] +"."+ filt.getQName());
                   continue;
                 }
@@ -228,6 +289,7 @@ class VController {
             }
       }
       float [] vals = {lowVal, highVal};
+      lowHighMem.put(idString, new Pair<Float>(lowVal, highVal));
       return vals;
     }  
       
