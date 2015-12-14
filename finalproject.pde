@@ -5,11 +5,14 @@ import controlP5.*;
 ControlP5 cp5;
 boolean DEBUG = false;
 
-color textcol = color(0,0,0);
+color textcol = color(10,10,10);
+color controlButtonCol = color(128,128,128);
 color backgroundcol = color(249,249,249);
 color filtOnCol     = color(44,32,147);
 color filtOffCol    = color(44,32,67);
 color filtActiveCol = color(84,52,87);
+color highlightCol  = color(255, 255, 0);
+color highlightStrokeCol = color(10,240,27);
 // our controller, for filter/school/slider changes
 // additionally, that's where the school & filter classes are
 // It's a little confusing since, controlP5 uses the same name for it's

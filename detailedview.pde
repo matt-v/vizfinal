@@ -62,7 +62,7 @@ public class DetailedView extends PApplet {
       float barsize = (xsize * 0.6) / (activeSchools.length * 1.5);
       
       // vertical labels
-      fill(10,10,10);
+      fill(textcol);
       textAlign(RIGHT);
       
       int ticks = 5;
@@ -95,7 +95,7 @@ public class DetailedView extends PApplet {
         //if mouse over this bar
         if ( transX >= xmin + xloc && transX <= xmin + xloc + barsize 
           && transY >= ystart + ysize && transY <= ystart ) {
-          fill( color(255,255,0) );  
+          fill( highlightCol );  
         } else {
           fill( activeSchools[i].col );
         }
@@ -122,18 +122,18 @@ public class DetailedView extends PApplet {
             } else { 
               valuepair += datapoint + ")";
             }
-            fill(10,10,10);
+            fill(textcol);
             textAlign(CENTER);
             text(valuepair, xloc + barsize/2, ystart + ysize - xdistance/4);
         }
       }
       
       // horizontal labels
-      fill(10,10,10);
+      fill(textcol);
       textAlign(RIGHT);
       for( int i = 0; i < activeSchools.length ; i++ ) {
         float x = xsize * 0.2 + (xdistance * i) + (barsize * 0.75) + 2;
-        float y = ysize *0.89;
+        float y = ysize * 0.89;
         pushMatrix();
         translate(x,y);
         rotate(HALF_PI *3);
@@ -229,8 +229,8 @@ public class DetailedView extends PApplet {
   }
   
   private void drawControls() {
-    fill( backgroundcol ); 
-    stroke( color(25,0,75));
+    fill( backgroundcol, 50 ); 
+    stroke( color(25,0,75) );
     strokeWeight(2);
     rect(width - 110, 10, 100, height - 20, 10);
     
@@ -240,27 +240,26 @@ public class DetailedView extends PApplet {
     text("Zoom", width - 60, (height-22)/2 - 12 );
     text("Scan", width - 60, (height-22) - 32 );
     
-    
-    
+      
     // zoom
-    if ( moveAction == 0 ) { fill(255,255,0); } else { fill(110,70,110); }
+    if ( moveAction == 0 ) { fill(highlightCol); } else { fill(controlButtonCol); }
     if (  25 > sqrt( sq(mouseX - (width - 60)) + sq(mouseY - ((height-22)/2 - 72)))) {
       strokeWeight(2);
-      stroke(10,200,27);
+      stroke(highlightStrokeCol);
     } else {
       strokeWeight(1);
-      stroke(110,78,128);    
+      stroke(30,78,30);    
     }
     ellipse(width - 60, (height-22)/2 - 72, 50, 50 );
     
     // scan
-    if ( moveAction == 1) { fill(255,255,0); } else { fill(110,70,110); }
+    if ( moveAction == 1) { fill(highlightCol); } else { fill(controlButtonCol); }
     if (  25 > sqrt( sq(mouseX - (width - 60)) + sq(mouseY - ((height-22) - 92)))) {
       strokeWeight(2);
-      stroke(10,200,27);
+      stroke(highlightStrokeCol);
     } else {
       strokeWeight(1);
-      stroke(110,78,128);
+      stroke(30,78,30);
     }  
     ellipse(width - 60, (height-22)   - 92, 50, 50 );
     
@@ -269,71 +268,6 @@ public class DetailedView extends PApplet {
   
 } 
 // end detailed view class
-  /*
-  
-  ControlP5 cp5;
-  Chart [] bars = new Chart[3];
-  
-  public void setup() {
-    cp5 = new ControlP5(this);
-  }
-  
-  public void draw() {
-    background(backgroundcol);
-    if ( updateForDetailed ) { update(); }
-    if ( bars[0] != null ) { 
-      School [] activeSchools = controller.getActiveSchools();
-      for ( int i = 0 ; i < activeSchools.length ; i++ ) {
-        try {
-        bars[0]
-          .unshift("incoming", 
-            controller.dataPoint( activeSchools[i], controller.filters[controller.selectedFilter[0]]));
-        } catch (Exception ex) {
-          // skip
-        }
-      }
-    }
-    //bars[0].push("incoming", (sin(frameCount*0.1)*10));
-
-  }
-  
-  public void update() {
-    if ( controller.selectedFilter[0] != -1 )  {
-      initBar(0, controller.filters[controller.selectedFilter[0]]);
-    }
-    updateForDetailed = false;
-  }
-  
-  public void initBar( int barsi, Filter filt ) {
-    if ( bars[barsi] != null ) {
-      bars[barsi].remove();
-    }
-    School [] activeSchools = controller.getActiveSchools();
-    float [] lowhi = controller.lowAndHighFor( activeSchools, filt );
-    bars[barsi] = cp5.addChart(filt.getDisplayName())
-              .setCaptionLabel(filt.getDisplayName())
-              .setPosition(10 + barsi*width/3, 10)
-              .setRange(lowhi[0],lowhi[1])
-              .setSize((int) width/3 - 20, height-20)
-              .setView(Chart.BAR_CENTERED)
-              .setStrokeWeight(1.5)
-              .setColorCaptionLabel(color(40))
-              ;
-    bars[barsi].addDataSet("incoming");
-    bars[barsi].setData("incoming", new float[activeSchools.length]);
-    for ( int i = 0 ; i < activeSchools.length ; i++ ) {
-      try {
-        bars[barsi]
-          .unshift("incoming", controller.dataPoint( activeSchools[i], filt ));
-      } catch (Exception ex) {
-          // skip
-      }
-    }
-  }
-}
-*/
-
-
 
 
 

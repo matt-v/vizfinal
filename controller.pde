@@ -153,7 +153,7 @@ class VController {
       String idString = id + field + selectedYear;
       if ( dataPointMem.containsKey(idString) ) {
         return dataPointMem.get(idString);
-      }      
+      }     
       
       JSONArray values = controller.json.getJSONArray("results");
       for ( int i = 0 ; i < values.size() ; i++ ) {
@@ -186,8 +186,7 @@ class VController {
           }
         }
       }
-      println("BAD ENTRY INTO DATAPOINT: " + idString );         
-
+      if (DEBUG) println("BAD ENTRY INTO DATAPOINT: " + idString );         
       dataPointMem.put(idString, new Float(-1.0));
       return -1;
     }

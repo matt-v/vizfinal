@@ -1,4 +1,5 @@
 public class MainView extends PApplet {
+  
   Filter [] filters;
   School [] schools;
   
@@ -10,29 +11,79 @@ public class MainView extends PApplet {
   int ymargin   = topMar + botMar;
   
   color primary    = color(7,33,190);
-  color secondary  = color(7,33,190);
+  color secondary  = color(0,100,255);
   
-  boolean useDataLess = true;
+  boolean useDataLess = true;             // should we show empty filters
+  String caption = "";                    // caption for empty filter toggle
+  float captionWidth;
   
   public void setup() {
+    textSize(14);
+    captionWidth = textWidth("Drop empty");
     update();    
   }
   
   public void draw() {
     if (updateForMain) update();
     background(backgroundcol);
-    drawDataBars();
-    drawCurves();
+    drawData();
+    drawDropButton();
+  }
+  
+  boolean clickToggled() {
+    if ( mouseX > width-(captionWidth+40) 
+    && mouseX < width-(captionWidth+40) + 150 
+    && mouseY > 150 
+    && mouseY < 184) {
+      useDataLess = !useDataLess;
+      updateForMain = true;
+      return true;
+    } else {
+      return false;
+    }  
+  }
+  
+  void drawDropButton() { 
+    
+    fill(primary);
+    if ( mouseX > width-(captionWidth+40) 
+    && mouseX < width-(captionWidth+40) + 150 
+    && mouseY > 150 
+    && mouseY < 184) { 
+      strokeWeight(3);
+      stroke(highlightStrokeCol);
+    } else {
+      strokeWeight(1);
+      stroke(highlightCol);
+    }
+    rect(width-(captionWidth+40), 150, captionWidth+20, 34);
+    
+    textSize(14);
+    textAlign(CENTER);
+    if (useDataLess) {
+      fill(255);
+    } else {
+      fill(0);
+    }
+    text(caption, width-(captionWidth/2 + 30), 170);
   }
   
   public void update() {
     schools  = controller.getActiveSchools();
     filters  = controller.getActiveFilters();
-    if (!useDataLess) filters = dataFullFilters(); 
+    if (useDataLess) {
+      caption = "Keep empty";      
+    } else {
+      filters = dataFullFilters();
+      caption = "Drop empty";
+    }
     updateForMain = false; 
   }
   
   void mouseClicked() {
+    if ( clickToggled() ) {
+      return;
+    }
     float distance = (width - xmargin)  / filters.length;
     float wide     = distance/4.0;
     float tall     = height - ymargin;
@@ -49,6 +100,7 @@ public class MainView extends PApplet {
         }
     }
   }
+  
   Filter [] dataFullFilters() {
     ArrayList<Filter> datafull = new ArrayList<Filter>();
     for( int i = 0; i < filters.length; i++ ) {
@@ -58,19 +110,20 @@ public class MainView extends PApplet {
     }
     return datafull.toArray(new Filter[0]);
   }
-  void drawDataBars() {
+  
+  void drawData() {
 
     float distance = (width - xmargin)  / filters.length;
     float wide     = distance/8.0;
     float tall     = height - ymargin; 
     
-    
+    // draw each of the data bars
     for ( int i = 0; i < filters.length ; i++ ) {
       // draw the bar
       float left = leftMar + i*distance + 2.5*wide;
       if ( mouseX > left && mouseX < left+wide  ) {
         strokeWeight(2);
-        stroke(255,255,0);
+        stroke(highlightStrokeCol);
       } else {
         strokeWeight(1);
         stroke(primary);
@@ -93,12 +146,13 @@ public class MainView extends PApplet {
         text(vals[0]+"\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);
       }
     }
+    drawCurves( distance, tall, wide );
   }
-  void drawCurves() {
+  
+  void drawCurves(float distance, float tall, float wide) {
 
-    float distance = (width - xmargin)  / filters.length;
     float start    = leftMar + distance*0.375;
-    float tall     = height - ymargin; 
+
     noFill();
     for ( int i = 0 ; i < schools.length ; i++ ) {
       strokeWeight(2);
@@ -128,9 +182,13 @@ public class MainView extends PApplet {
           }
           float delta      = scaledVal2 - scaledVal1;
           bezier(left,  height - (botMar+scaledVal1), 
-              left+distance*0.35, height - (botMar+scaledVal1+delta), 
-              left+distance*0.65, height - (botMar+scaledVal2-delta), 
-              left+distance, height - (botMar+scaledVal2) );
+              left+distance*0.35,  height - (botMar+scaledVal2),
+              left+distance*0.65,  height - (botMar+scaledVal1),
+              left+distance, height - (botMar+scaledVal2));
+          //bezier(left,  height - (botMar+scaledVal1), 
+          //    left+distance*0.35, height - (botMar+scaledVal1+delta), 
+          //    left+distance*0.65, height - (botMar+scaledVal2-delta), 
+          //    left+distance, height - (botMar+scaledVal2) );
         } catch (Exception ex) {
           if (DEBUG) println("No data for " + schools[i].name + " for field " + filters[j].getQName());
         }
