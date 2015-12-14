@@ -52,19 +52,16 @@ public class MainView extends PApplet {
     && mouseY < 184) { 
       strokeWeight(3);
       stroke(highlightStrokeCol);
+      fill(primary);
     } else {
       strokeWeight(1);
-      stroke(highlightCol);
+      stroke(secondary);
     }
     rect(width-(captionWidth+40), 150, captionWidth+20, 34);
     
     textSize(14);
     textAlign(CENTER);
-    if (useDataLess) {
-      fill(255);
-    } else {
-      fill(0);
-    }
+    fill(255);
     text(caption, width-(captionWidth/2 + 30), 170);
   }
   
