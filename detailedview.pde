@@ -30,7 +30,7 @@ public class DetailedView extends PApplet {
     
     private void getFiltVals() {
       activeSchools = controller.getActiveSchools();
-      lowHi = controller.lowAndHighFor( activeSchools, filt );
+      lowHi = controller.lowAndHighFor( filt );
     }
     
     public void draw() {
@@ -76,10 +76,12 @@ public class DetailedView extends PApplet {
         text( vallab, xsize * 0.15, ysize * 0.8 - (i * ysize * 0.6 / ticks) );
       }
       
-      /*******   draw bars    ******/
+      // *******   draw bars    ******
       // mouse location adjusted for scan and zoom
-      float transX = (mouseX - leftshift) / zoom ; 
-      float transY = (mouseY - topshift) / zoom ;
+      //leftshift - (zoom-1)*width/(zoom*2)
+      float transX = (mouseX - leftshift) * zoom; 
+      float transY = (mouseY - topshift) * zoom;
+      
       xstart = xstart + (barsize/4);
       for ( int i = 0; i < activeSchools.length; i++ ) {
         float xloc = xstart + xdistance * i;
@@ -172,8 +174,13 @@ public class DetailedView extends PApplet {
     float dx = mouseX - startX;
     float dy = mouseY - startY;
     switch (moveAction) {
-      case 0:  
-        zoom += dy / 100.0;
+      case 0:                 
+        //leftshift += (zoom-1)*width/(zoom*2);
+        //topshift += (zoom-1)*height/(zoom*2);
+        float dz = dy / 100.0;
+        //leftshift -=  dz/2 * (width/zoom); // /(2*zoom);
+        //topshift  -=  dz/2 * (height/zoom); // /(2*zoom);
+        zoom += dz;
         break;
       case 1: 
         leftshift += dx; 
@@ -204,10 +211,14 @@ public class DetailedView extends PApplet {
     }
     pushMatrix();
     background(backgroundcol);
-    scale(zoom);
     // translation with a centered zoom
-    translate(leftshift - (zoom-1)*width/(zoom*2), 
-               topshift - (zoom-1)*height/(zoom*2));
+    //
+     scale(zoom); 
+     translate(leftshift - (zoom-1)*width/(zoom*2), 
+                topshift - (zoom-1)*height/(zoom*2));
+     
+    //translate(leftshift, topshift);
+    //scale(zoom);
     
     
     for ( int i = 0; i < barcharts.length; i++ ) {

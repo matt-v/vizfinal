@@ -3,15 +3,16 @@ import javax.swing.*;
 import controlP5.*;
 
 ControlP5 cp5;
+DropdownList d1;
 boolean DEBUG = false;
 
-color textcol = color(10,10,10);
-color controlButtonCol = color(128,128,128);
-color backgroundcol = color(249,249,249);
-color filtOnCol     = color(44,32,147);
-color filtOffCol    = color(44,32,67);
-color filtActiveCol = color(84,52,87);
-color highlightCol  = color(255, 255, 0);
+color textcol            = color(10,10,10);
+color controlButtonCol   = color(128,128,128);
+color backgroundcol      = color(253,254,252);
+color filtOnCol          = color(44,32,147);
+color filtOffCol         = color(44,32,67);
+color filtActiveCol      = color(84,52,87);
+color highlightCol       = color(255, 255, 0);
 color highlightStrokeCol = color(10,240,27);
 // our controller, for filter/school/slider changes
 // additionally, that's where the school & filter classes are
@@ -33,7 +34,7 @@ void setup() {
   smooth();
   cp5 = new ControlP5(this);
   
-  /**** INITIALIZING SLIDER ******/
+  // *** INITIALIZING SLIDER ****
   cp5.addSlider("slider")
     .setPosition(30,10)
     .setWidth(width-60)
@@ -43,28 +44,58 @@ void setup() {
     .setDecimalPrecision(0)
     .setSliderMode(Slider.FLEXIBLE);
     
-    /**** INITIALIZING SCHOOL BUTTONS ******/
+    //          SCHOOL DROP DOWN       ****
+    
+//    CallbackListener dropcontrol = new CallbackListener() {
+//      public void controlEvent(CallbackEvent theEvent) {
+//        controller.schools[(int) theEvent.getController().getValue()].checked = true;
+//        controller.update();
+//        //println("event from controller : "+theEvent.getController().getValue()+" from "+theEvent.getController());
+//      }
+//    };
+//    
+//    d1 = cp5.addDropdownList("addSchool")
+//          .setPosition(width-100, 10)
+//          .onChange(dropcontrol)
+//          ;
+//    d1.setBackgroundColor(color(190));
+//    d1.setItemHeight(20);
+//    d1.setBarHeight(15);
+//    d1.setCaptionLabel("Add a school");
+//    for (int i = 0; i < controller.schools.length; i++) {
+//      d1.addItem(controller.schools[i].name, i);
+//    }
+//    d1.setColorBackground(color(60));
+//    d1.setColorActive(color(255, 128)); 
+    
+    
+    //   INITIALIZING SCHOOL BUTTONS *****
     CallbackListener pressschool = new CallbackListener() {
       public void controlEvent(CallbackEvent theEvent) {
         int schoolindex = (int)theEvent.getController().getValue();
         controller.toggleSchool(schoolindex);
       }
     }; 
-    int distance = (width - 60)/controller.schools.length;
+    
+    int distance = (width - 60)/(controller.schools.length/2 +1);
     int buttonwidth = (int)(distance*0.85);
     for( int i = 0 ; i < controller.schools.length ; i++ ) {
-      cp5.addButton(controller.schools[i].name)
+      Button temp = cp5.addButton(controller.schools[i].name)
        .setValue(i)
-       .setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.25))
        .setColorBackground( 100 )
        .setSwitch(true).setOn()
        .setColorActive(controller.schools[i].col)
-       .setSize(buttonwidth,20)
+       .setSize(buttonwidth,25)
        .onPress(pressschool)
        ;
+      if ( i <= controller.schools.length/2 ) {
+        temp.setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.25));
+      } else {
+        temp.setPosition((distance*0.07) + 30 + (i - controller.schools.length/2 - 1)*distance ,(int)(height*0.25) + 35);
+      }
      }
      
-     /**** INITIALIZING FILTER BUTTONS ******/
+     //  INITIALIZING FILTER BUTTONS ****
      distance = (width - 60)/controller.filters.length;
      buttonwidth = (int)(distance*0.85);
      CallbackListener onclickfilt = new CallbackListener() {
@@ -110,17 +141,17 @@ void setup() {
            }
          }
          if ( !foundLocation ) { 
-           fbut.setPosition((distance*0.07) + 30 + currindex*distance,(int)(height*0.5));
+           fbut.setPosition((distance*0.07) + 30 + currindex*distance,(int)(height*0.85));
          }
        }
      };
           
-     /* link buttons to filters, so the controller knows what buttons need to move
-      * with what fitler when they're dragged */     
+     // link buttons to filters, so the controller knows what buttons need to move
+     // with what fitler when they're dragged     
      for( int i = 0 ; i < controller.filters.length ; i++ ) {
        controller.filters[i].linkButton(
          cp5.addButton(controller.filters[i].getDisplayName())
-           .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.5))
+           .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.85))
            .setSize(buttonwidth,20)
            .onDrag(ondrag)
            .onEndDrag(ondragend)
@@ -148,7 +179,7 @@ void draw() {
   for( int i = 0 ; i < controller.filters.length ; i++ ) {
          fill(128);
          stroke(100);
-         rect((distance*0.07) + 28 + i*distance,(height * 0.5) - 2, buttonwidth + 4, 24);
+         rect((distance*0.07) + 28 + i*distance,(height * 0.85) - 2, buttonwidth + 4, 24);
   }
 }
 
@@ -164,17 +195,17 @@ void update() {
     }
     controller.filters[i].fbutton
      .setColorBackground(fcol)
-     .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.5));
+     .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.85));
   }
   updateForControlView = false;   
 }
 
 void slider(float val) {
-  controller.selectedYear = val;
+  controller.changeYear(val);
 }
 
 
-/* makes additional windows */
+// makes additional windows 
 public class PFrame extends JFrame {
   public PFrame(PApplet s, int left, int top, int w, int h) {
     setBounds(left, top, w, h);

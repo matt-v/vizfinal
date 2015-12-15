@@ -1,57 +1,3 @@
-public class Filter {
-  private String  displayname;
-  private String  fieldname;
-  /* field types */
-  // INT   = 1
-  // FLOAT = 2
-  private int     fieldtype;
-  private boolean checked;
-  Button fbutton = null;
-  
-  Filter( String displayname, String fieldname, int fieldtype, boolean checked ) {
-    this.displayname = displayname;
-    this.fieldname   = fieldname;
-    this.fieldtype   = fieldtype;
-    this.checked     = checked;
-  }
-  void toggle()           { checked = !checked; }
-  boolean isChecked()     { return checked;     }
-  String getDisplayName() { return displayname; }
-  String getQName()       { return fieldname;   }
-  int getType()           { return fieldtype;   }
-  
-  void linkButton( Button fbutton ) {
-   if ( this.fbutton == null ) this.fbutton = fbutton;
-   else { println("Cant relink button! " + fieldname); System.exit(-1); }
-  }
-  Button getButton() { return fbutton; }
-  
-  
-  String getQueryForYears (int [] years ) {
-    String qString = "";
-    for ( int i = 0 ; i < years.length ; i++ ) {
-      if ( i > 0 ) { 
-        qString += ","; 
-      }
-      qString += years[i] + "." + fieldname;
-    }
-    return qString;
-  } 
-}
-public class School {
-  String name, id;
-  boolean checked;
-  color col;
-  School(String name, String id, color col, boolean checked) {
-    this.name = name;
-    this.id = id;
-    this.col = col;
-    this.checked = checked;
-  }
-  void toggle() { checked = !checked; }
-  boolean isChecked() { return checked; }
-}
-
 class VController {
     // memoization hashmap
     HashMap<String, Pair<Float>> lowHighMem = new HashMap<String, Pair<Float> >();
@@ -63,7 +9,7 @@ class VController {
     float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
     int [] years = new int[] {2007,2008,2009, 2010, 2011, 2012, 2013};
     JSONObject json = null; // Data from query
-  /* should be pulling filters and schools from cvs ... but this will due in a crunch */
+    // should be pulling filters and schools from cvs ... but this will due in a crunch 
     Filter [] filters = new Filter[]
     { new Filter ("Mid SAT"   , "admissions.sat_scores.average.overall", 1, true),
       new Filter ("Admission rate", "admissions.admission_rate.overall", 2, true),
@@ -101,8 +47,8 @@ class VController {
     }
     
     void changeYear  ( float year ) { selectedYear = year; nonQueryUpdate(); }
-    void toggleFilter( int n ) { filters[n].toggle(); update(); }
-    void toggleSchool( int n ) { schools[n].toggle(); update(); }
+    void toggleFilter( int n ) { filters[n].toggle(); nonQueryUpdate(); }
+    void toggleSchool( int n ) { schools[n].toggle(); nonQueryUpdate(); }
     
     // This changes the position of the filters in the arrary... their order in the array is their
     // order in the main view
@@ -139,11 +85,21 @@ class VController {
           return i;
         }
       }
-      println("Couldn't filter in filter list");
+      println("Couldn't find filter in filter list");
       System.exit(-1);
       return -1;
     }
     
+    int getSchoolIndex ( School s ) {
+      for ( int i = 0; i < schools.length; i++ ) {
+        if (schools[i].id.equals( s.id )) return i;
+      }
+      println("Couldn't find school in school list");
+      System.exit(-1);
+      return -1;
+    }
+    
+    // get data point for one school
     float dataPoint( School school, Filter filt ) {
       String id = school.id;
       String field = filt.getQName();
@@ -153,7 +109,7 @@ class VController {
       String idString = id + field + selectedYear;
       if ( dataPointMem.containsKey(idString) ) {
         return dataPointMem.get(idString);
-      }     
+      }   
       
       JSONArray values = controller.json.getJSONArray("results");
       for ( int i = 0 ; i < values.size() ; i++ ) {
@@ -181,14 +137,14 @@ class VController {
                return lyval;
             }           
             float result = lyval + (hyval-lyval)*(selectedYear - lowYear)/(highYear - lowYear);
-            dataPointMem.put(idString, new Float(result)); 
+            dataPointMem.put(idString, result); 
             return result;
           }
         }
       }
-      if (DEBUG) println("BAD ENTRY INTO DATAPOINT: " + idString );         
-      dataPointMem.put(idString, new Float(-1.0));
-      return -1;
+      if (DEBUG) { println("BAD ENTRY INTO DATAPOINT: " + idString ); }        
+      dataPointMem.put(idString, Float.NaN);
+      return Float.NaN;
     }
     
     Filter [] getActiveFilters() {
@@ -207,6 +163,7 @@ class VController {
         return sc.toArray(new School[0]);
     }
     
+    // string id's of schools
     String [] getSchoolIds() {
       ArrayList<String> ids = new ArrayList<String>();
       for ( int i = 0; i < schools.length; i++ ) {
@@ -214,36 +171,41 @@ class VController {
         }
         return ids.toArray(new String[0]);
     }
-    /* only for int years, not floating point mid-years */
+    
+    // only for int years, not floating point mid-years
     float valueFor( String id, int year, Filter filt ) {
-      String idString = id + filt.getQName() + year;
+      String idString = "VALFOR" + id + filt.getQName() + year;
       if ( dataPointMem.containsKey(idString) ) {
         return dataPointMem.get(idString);
       }
       JSONArray results = controller.json.getJSONArray("results");
       for ( int i = 0 ; i < results.size(); i++ ) {
         JSONObject record = results.getJSONObject(i);
+        
+        String queryString = year + "." + filt.getQName();
         if ( parseInt(id) == record.getInt("id") ) {
-          if (filt.getType() == 1) {
-            float result = record.getInt(year + "." + filt.getQName() );
+          if (filt.getType() == 1 && !record.isNull(queryString) ) {
+            float result = record.getInt(queryString);
             dataPointMem.put(idString, result);
             return result;
-          } else if (filt.getType() == 2) {
-            float result = record.getFloat(year + "." + filt.getQName() );
+          } else if (filt.getType() == 2 && !record.isNull(queryString) ) {
+            float result = record.getFloat(queryString);
             dataPointMem.put(idString, result);
             return result;
           }
         }
       }
-      if (DEBUG) println("ERROR IN VALUEFOR() "+ id+ " in " + year);
-      return MAX_FLOAT;
+      if (DEBUG) { println("ERROR IN VALUEFOR() "+ id+ " in " + year); } 
+      return Float.NaN;
     }
+    
+    // true if schools have data
     boolean schoolsHaveData( School [] activeSchools, Filter filt ) {
       int lowYear  = (int) floor(selectedYear);
       int highYear = (int) ceil(selectedYear);
       for ( int aci = 0; aci < activeSchools.length; aci++ ) {
         String id = activeSchools[aci].id;
-        JSONArray results = controller.json.getJSONArray("results");
+        JSONArray results = json.getJSONArray("results");
         for ( int i = 0 ; i < results.size(); i++ ) {
           JSONObject record = results.getJSONObject(i);
           if ( parseInt(id) == record.getInt("id") ) {
@@ -256,43 +218,46 @@ class VController {
       }
       return false;
     }
-    float [] lowAndHighFor( School [] activeSchools, Filter filt ) {
+    // THIS IS WHERE THE ERROR IS
+    
+    float [] lowAndHighFor( Filter filt ) {
       String idString = "";
-      for (int i = 0; i < activeSchools.length; i++ ) {
-        idString += activeSchools[i].id;
+      for (int i = 0; i < schools.length; i++ ) {
+        idString += schools[i].id;
       }
       idString += filt.getQName();
+      
       if ( lowHighMem.containsKey(idString) ) {
         Pair<Float> lohi = lowHighMem.get(idString);
         float [] result = {lohi.fst, lohi.snd};
         return result; 
-      } 
-      ArrayList<String> ids = new ArrayList<String>();
+      }
       float lowVal  = MAX_FLOAT;
       float highVal = MIN_FLOAT;
-      for ( int i = 0; i < activeSchools.length; i++ ) {
+      for ( int i = 0; i < schools.length; i++ ) {
             for ( int j = 0; j < years.length; j++ ) {
                 float candidate;
                 try {
-                   candidate = valueFor( activeSchools[i].id, years[j], filt );
+                   candidate = valueFor( schools[i].id, years[j], filt );
                 } catch (Exception ex) {
-                  if (DEBUG) println("No value for " + activeSchools[i].id + " in " + years[j] +"."+ filt.getQName());
+                  if (DEBUG) { 
+                    println("No value for " + schools[i].id + " in " + years[j] +"."+ filt.getQName());
+                  }
                   continue;
                 }
-                if ( candidate == MAX_FLOAT ) { continue; }
-                else if ( candidate > highVal ) {
+                if ( candidate == Float.NaN ) { 
+                  continue; 
+                } else if ( candidate > highVal ) {
                   highVal = candidate;
-                }
-                else if ( candidate < lowVal ) {
+                } else if ( candidate < lowVal ) {
                   lowVal = candidate;
                 }
             }
       }
-      float [] vals = {lowVal, highVal};
       lowHighMem.put(idString, new Pair<Float>(lowVal, highVal));
+      float [] vals = {lowVal, highVal};
       return vals;
-    }  
-      
+    }   
     
     JSONObject query() {
       Criteria [] criteria = new Criteria[] {new Criteria ("id", getSchoolIds() ) };
@@ -314,5 +279,6 @@ class VController {
       json = query();
       nonQueryUpdate();
     }
+    
     
 }

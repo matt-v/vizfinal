@@ -40,7 +40,7 @@ public class MainView extends PApplet {
       return true;
     } else {
       return false;
-    }  
+    }    
   }
   
   void drawDropButton() { 
@@ -81,6 +81,7 @@ public class MainView extends PApplet {
     if ( clickToggled() ) {
       return;
     }
+
     float distance = (width - xmargin)  / filters.length;
     float wide     = distance/4.0;
     float tall     = height - ymargin;
@@ -109,7 +110,8 @@ public class MainView extends PApplet {
   }
   
   void drawData() {
-
+    if (filters.length == 0) return;
+    
     float distance = (width - xmargin)  / filters.length;
     float wide     = distance/8.0;
     float tall     = height - ymargin; 
@@ -128,7 +130,7 @@ public class MainView extends PApplet {
       noFill();
       rect(left, topMar, wide, tall, 22);
       // draw the low and high values
-      float [] vals = controller.lowAndHighFor( schools, filters[i] );
+      float [] vals = controller.lowAndHighFor(filters[i] );
       fill(textcol);
       textAlign(CENTER);
       textSize(14);
@@ -143,7 +145,7 @@ public class MainView extends PApplet {
         text(vals[0]+"\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);
       }
     }
-    drawCurves( distance, tall, wide );
+    drawCurves( distance, tall, wide);
   }
   
   void drawCurves(float distance, float tall, float wide) {
@@ -157,20 +159,22 @@ public class MainView extends PApplet {
       for ( int j = 0 ; j < filters.length-1 ; j++ ) {
         try {
           float left = start + j*distance;
-          float [] vals1   = controller.lowAndHighFor( schools, filters[j] );
+          float [] vals1   = controller.lowAndHighFor( filters[j] );
           float lowVal1    = vals1[0];
           float highVal1   = vals1[1];
           float pointVal1  = controller.dataPoint( schools[i], filters[j] );
+          if ( pointVal1 == Float.NaN ) { throw new Exception(); } // failure code
           float scaledVal1;
           if ( highVal1 - lowVal1 == 0 ) {
             scaledVal1 = tall/2;
           } else {
             scaledVal1 = tall * (pointVal1 - lowVal1) / (highVal1 - lowVal1);
           }
-          float [] vals2   = controller.lowAndHighFor( schools, filters[j+1] );
+          float [] vals2   = controller.lowAndHighFor( filters[j+1] );  
           float lowVal2    = vals2[0];
           float highVal2   = vals2[1];
-          float pointVal2  = controller.dataPoint( schools[i], filters[j+1] );
+          float pointVal2  = controller.dataPoint( schools[i], filters[j+1] );         
+          if ( pointVal2 == Float.NaN ) { throw new Exception(); } //failure code
           float scaledVal2;
           if ( highVal2 - lowVal2 == 0 ) {
             scaledVal2 = tall/2;
@@ -182,17 +186,12 @@ public class MainView extends PApplet {
               left+distance*0.35,  height - (botMar+scaledVal2),
               left+distance*0.65,  height - (botMar+scaledVal1),
               left+distance, height - (botMar+scaledVal2));
-          //bezier(left,  height - (botMar+scaledVal1), 
-          //    left+distance*0.35, height - (botMar+scaledVal1+delta), 
-          //    left+distance*0.65, height - (botMar+scaledVal2-delta), 
-          //    left+distance, height - (botMar+scaledVal2) );
         } catch (Exception ex) {
           if (DEBUG) println("No data for " + schools[i].name + " for field " + filters[j].getQName());
+          continue;
         }
       } // end for j
     } // end for i
   }
   
 }
-
-
