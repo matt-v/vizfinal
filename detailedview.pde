@@ -79,8 +79,11 @@ public class DetailedView extends PApplet {
       // *******   draw bars    ******
       // mouse location adjusted for scan and zoom
       //leftshift - (zoom-1)*width/(zoom*2)
-      float transX = (mouseX - leftshift) * zoom; 
-      float transY = (mouseY - topshift) * zoom;
+      //float transX = (mouseX - leftshift + (zoom-1)*width/(zoom*2)) / zoom; 
+      //float transY = (mouseY - topshift + (zoom-1)*height/(zoom*2)) / zoom;
+      
+      float transX = mouseX/zoom - leftshift + (zoom-1)*width /(zoom*2);
+      float transY = mouseY/zoom - topshift  + (zoom-1)*height/(zoom*2);
       
       xstart = xstart + (barsize/4);
       for ( int i = 0; i < activeSchools.length; i++ ) {
@@ -158,7 +161,7 @@ public class DetailedView extends PApplet {
   int moveAction = 0; //0 = zoom, 1 = scan
   
   public void setup() {
-    size(displayWidth,(int)(displayHeight*0.37));
+    size(displayWidth-4,(int)(displayHeight*0.35));
   }
   
   public void mousePressed() {
@@ -212,13 +215,10 @@ public class DetailedView extends PApplet {
     pushMatrix();
     background(backgroundcol);
     // translation with a centered zoom
-    //
-     scale(zoom); 
-     translate(leftshift - (zoom-1)*width/(zoom*2), 
-                topshift - (zoom-1)*height/(zoom*2));
-     
-    //translate(leftshift, topshift);
-    //scale(zoom);
+    scale(zoom);
+    translate(leftshift - (zoom-1)*width/(zoom*2), 
+               topshift - (zoom-1)*height/(zoom*2));
+    //scale(zoom); 
     
     
     for ( int i = 0; i < barcharts.length; i++ ) {
