@@ -125,7 +125,11 @@ public class DetailedView extends PApplet {
             if (datapoint == MIN_FLOAT) {
               valuepair += "value not in data" +")";  
             } else { 
-              valuepair += datapoint + ")";
+              if (filt.fieldtype == 2) {
+                valuepair += (datapoint*100) +"%)";
+              } else {
+                valuepair += datapoint + ")";
+              }
             }
             fill(textcol);
             textAlign(CENTER);

@@ -152,11 +152,12 @@ public class MainView extends PApplet {
 
     float start    = leftMar + distance*0.375;
 
-    noFill();
+    
     for ( int i = 0 ; i < schools.length ; i++ ) {
       for ( int j = 0 ; j < filters.length-1 ; j++ ) {
         strokeWeight(2);
         stroke(schools[i].col);
+        noFill();
         try {
           float left = start + j*distance;
           float [] vals1   = controller.lowAndHighFor( filters[j] );
@@ -187,16 +188,36 @@ public class MainView extends PApplet {
               left+distance*0.65,  height - (botMar+scaledVal1),
               left+distance, height - (botMar+scaledVal2));
           
-          if ( 10 > sqrt(sq(mouseX - left) + sq(mouseY - height + botMar+scaledVal1))) {
+          if ( 5 > sqrt(sq(mouseX - left) + sq(mouseY - height + botMar+scaledVal1))) {
             strokeWeight(1);
             stroke(highlightStrokeCol);
             noFill();
             ellipse(left, height - (botMar+scaledVal1), 5, 5);
-          } else if ( 10 > sqrt(sq(mouseX-left-distance) + sq(mouseY-height+botMar+scaledVal2))){
+            fill(textcol);
+            textSize(11);
+            textAlign(CENTER);
+            String label = schools[i].name +" : ";
+            if ( filters[j].fieldtype == 2 ) {
+              label += (pointVal1*100) + "%";         
+              text(label, left, 15);
+            } else {
+              text(label + pointVal1, left, 15);
+            }
+          } else if ( 5 > sqrt(sq(mouseX-left-distance) + sq(mouseY-height+botMar+scaledVal2))){
             strokeWeight(1);
             stroke(highlightStrokeCol);
             noFill();
             ellipse(left+distance, height - (botMar+scaledVal2), 5, 5);
+            fill(textcol);
+            textSize(11);
+            textAlign(CENTER); 
+            String label = schools[i].name +" : ";
+            if ( filters[j+1].fieldtype == 2 ) {
+              label += (pointVal2*100) + "%";         
+              text(label, left+distance, 15);
+            } else {
+              text(label + pointVal2, left+distance, 15);
+            }        
           }
           
         } catch (Exception ex) {
