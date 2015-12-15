@@ -99,6 +99,22 @@ void setup() {
       }
      }
      
+     // all schools off button
+     CallbackListener schoolsoff = new CallbackListener() {
+      public void controlEvent(CallbackEvent theEvent) {
+        controller.allSchoolsOff();
+        for (School s : controller.schools) {
+          ((Button) cp5.get(s.name)).setOff();
+        }
+      }
+    }; 
+     cp5.addButton("No schools")
+       .setColorBackground( 100 )
+       .setSize(buttonwidth,25)
+       .onPress(schoolsoff)
+       .setPosition((distance*0.07) + 30,(int)(height*0.25) + 70);
+       ;
+     
      //  INITIALIZING FILTER BUTTONS ****
      distance = (width - 60)/controller.filters.length;
      buttonwidth = (int)(distance*0.85);

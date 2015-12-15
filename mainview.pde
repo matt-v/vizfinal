@@ -133,7 +133,7 @@ public class MainView extends PApplet {
       float [] vals = controller.lowAndHighFor(filters[i] );
       fill(textcol);
       textAlign(CENTER);
-      textSize(14);
+      textSize(11);
       if (filters[i].getType() == 1) {
         text(((int)vals[1]), left+wide/2, topMar-20);
         text(((int)vals[0])+"\n"+filters[i].getDisplayName(), left+wide/2, topMar+tall+20);

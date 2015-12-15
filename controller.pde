@@ -7,7 +7,7 @@ class VController {
     int [] selectedFilters = new int[] {-1,-1,-1}; // filters for detailed view
     int next = 0; // index into selected filter
     float selectedYear = 2010; // it's a float so we can have a smooth animation as we move the slider
-    int [] years = new int[] {2003,2004,2005,2006,2007,2008,2009, 2010, 2011, 2012, 2013};
+    int [] years = new int[] {2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013};
     JSONObject json = null; // Data from query
     // should be pulling filters and schools from cvs ... but this will due in a crunch 
     Filter [] filters = new Filter[]
@@ -19,6 +19,9 @@ class VController {
       new Filter ("Median dept", "aid.median_debt.completers.overall", 1, true),
       new Filter ("Percent with federal loans", "aid.federal_loan_rate", 2, true),
       new Filter ("Percent with Pell grant", "aid.pell_grant_rate", 2, true)
+      //new Filter ("Average faculty salary", "school.faculty_salary", 1, true),
+      //new Filter ("Average annual cost of attendance", "cost.avg_net_price.public", 1, true)
+     
     };
     
     School [] schools = new School[] 
@@ -49,6 +52,12 @@ class VController {
     void changeYear  ( float year ) { selectedYear = year; nonQueryUpdate(); }
     void toggleFilter( int n ) { filters[n].toggle(); nonQueryUpdate(); }
     void toggleSchool( int n ) { schools[n].toggle(); nonQueryUpdate(); }
+    void allSchoolsOff() {
+      for (int i = 0; i < schools.length; i++ ) {
+        schools[i].checked = false;
+      }
+      nonQueryUpdate(); 
+    }
     
     // This changes the position of the filters in the arrary... their order in the array is their
     // order in the main view

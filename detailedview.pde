@@ -218,7 +218,6 @@ public class DetailedView extends PApplet {
     scale(zoom);
     translate(leftshift - (zoom-1)*width/(zoom*2), 
                topshift - (zoom-1)*height/(zoom*2));
-    //scale(zoom); 
     
     
     for ( int i = 0; i < barcharts.length; i++ ) {
