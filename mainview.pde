@@ -154,9 +154,9 @@ public class MainView extends PApplet {
 
     noFill();
     for ( int i = 0 ; i < schools.length ; i++ ) {
-      strokeWeight(2);
-      stroke(schools[i].col);
       for ( int j = 0 ; j < filters.length-1 ; j++ ) {
+        strokeWeight(2);
+        stroke(schools[i].col);
         try {
           float left = start + j*distance;
           float [] vals1   = controller.lowAndHighFor( filters[j] );
@@ -186,6 +186,19 @@ public class MainView extends PApplet {
               left+distance*0.35,  height - (botMar+scaledVal2),
               left+distance*0.65,  height - (botMar+scaledVal1),
               left+distance, height - (botMar+scaledVal2));
+          
+          if ( 10 > sqrt(sq(mouseX - left) + sq(mouseY - height + botMar+scaledVal1))) {
+            strokeWeight(1);
+            stroke(highlightStrokeCol);
+            noFill();
+            ellipse(left, height - (botMar+scaledVal1), 5, 5);
+          } else if ( 10 > sqrt(sq(mouseX-left-distance) + sq(mouseY-height+botMar+scaledVal2))){
+            strokeWeight(1);
+            stroke(highlightStrokeCol);
+            noFill();
+            ellipse(left+distance, height - (botMar+scaledVal2), 5, 5);
+          }
+          
         } catch (Exception ex) {
           if (DEBUG) println("No data for " + schools[i].name + " for field " + filters[j].getQName());
           continue;
