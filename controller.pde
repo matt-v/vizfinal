@@ -17,10 +17,11 @@ class VController {
       new Filter ("Earnings after ten years", "earnings.10_yrs_after_entry.median", 1, true),
       new Filter ("Average graduate income", "student.avg_dependent_income.2014dollars", 1,true),
       new Filter ("Median dept", "aid.median_debt.completers.overall", 1, true),
-      new Filter ("Percent with federal loans", "aid.federal_loan_rate", 2, true),
-      new Filter ("Percent with Pell grant", "aid.pell_grant_rate", 2, true)
-      //new Filter ("Average faculty salary", "school.faculty_salary", 1, true),
-      //new Filter ("Average annual cost of attendance", "cost.avg_net_price.public", 1, true)
+      new Filter ("%Students with federal loans", "aid.federal_loan_rate", 2, true),
+      new Filter ("%Students with Pell grant", "aid.pell_grant_rate", 2, true),
+      new Filter ("%Students 25 or older", "student.share_25_older", 2, true),
+      
+      new Filter ("Average annual cost of attendance", "cost.avg_net_price.public", 1, true)
      
     };
     
@@ -42,7 +43,10 @@ class VController {
       new School ("Wesleyan University", "130697", color(148,17,77), true),
       new School ("Howard University", "131520", color(130,34,179), true),
       new School ("Morehouse College", "140553", color(200,170,6), true),
-      new School ("Spelman College", "141060", color(179,12,236), true)
+      new School ("Spelman College", "141060", color(179,12,236), true),
+      new School ("UMass Lowell", "166513", color(209,102,66), true),
+      new School ("Merrimack College", "166850", color(209,102,66), true)
+      
     };
     
     VController() {

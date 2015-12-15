@@ -165,7 +165,7 @@ public class DetailedView extends PApplet {
   int moveAction = 0; //0 = zoom, 1 = scan
   
   public void setup() {
-    size(displayWidth-4,(int)(displayHeight*0.35));
+    size(displayWidth-4,(int)(displayHeight*0.32));
   }
   
   public void mousePressed() {

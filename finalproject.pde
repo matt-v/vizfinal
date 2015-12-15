@@ -31,10 +31,10 @@ boolean dragflag = false;
 void setup() {
   
   // Create other views
-  new PFrame(new DetailedView(),2,(int)(displayHeight*0.01),displayWidth-4,(int)(displayHeight*0.35) ); 
-  new PFrame(new MainView(),    2,(int)(displayHeight*0.37),displayWidth-4,(int)(displayHeight*0.30) );
+  new PFrame(new DetailedView(),2,(int)(displayHeight*0.01),displayWidth-4,(int)(displayHeight*0.32) ); 
+  new PFrame(new MainView(),    2,(int)(displayHeight*0.33),displayWidth-4,(int)(displayHeight*0.27) );
 
-  size(displayWidth,(int)(displayHeight*0.25)); 
+  size(displayWidth-4,(int)(displayHeight*0.30));
   smooth();
   cp5 = new ControlP5(this);
   
@@ -92,10 +92,10 @@ void setup() {
        .setSize(buttonwidth,25)
        .onPress(pressschool)
        ;
-      if ( i <= controller.schools.length/2 ) {
+      if ( i <= controller.schools.length/2 )  {
         temp.setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.25));
       } else {
-        temp.setPosition((distance*0.07) + 30 + (i - controller.schools.length/2 - 1)*distance ,(int)(height*0.25) + 35);
+        temp.setPosition((distance*0.07) + 30 + (i - 1 - controller.schools.length/2 )*distance ,(int)(height*0.25) + 35);
       }
      }
      
@@ -116,7 +116,7 @@ void setup() {
        ;
      
      //  INITIALIZING FILTER BUTTONS ****
-     distance = (width - 60)/controller.filters.length;
+     distance = (width - 60)/(controller.filters.length/2 +1);
      buttonwidth = (int)(distance*0.85);
      CallbackListener onclickfilt = new CallbackListener() {
        public void controlEvent( CallbackEvent theEvent ) {
@@ -146,22 +146,35 @@ void setup() {
      // draggable filter buttons 
      CallbackListener ondragend = new CallbackListener() {
        public void controlEvent( CallbackEvent theEvent ) {
-         int distance = (width - 60)/controller.filters.length;
+         int distance = (width - 60)/(controller.filters.length/2 + 1);
          int buttonwidth = (int)(distance*0.85);
          Controller fbut = theEvent.getController();
          int currindex = controller.getFilterIndex( fbut );
          boolean foundLocation = false;
          for( int i = 0 ; i < controller.filters.length ; i++ ) {
-           float leftx = (distance*0.07) + 30 + i*distance;
+           float leftx, topy;
+           if ( i <= controller.filters.length/2 ) {
+             leftx = (distance*0.07) + 30 + i*distance;
+             topy  = (height*0.85) - 35;
+           } else {
+             leftx = (distance*0.07) + 30 + (i - 1 - controller.filters.length/2) * distance;
+             topy  = height*0.85;
+           }
            // if this filter button is within the x bounds of a filter location
-           if ( mouseX > leftx && mouseX < leftx + buttonwidth ) {
+           if ( mouseX > leftx && mouseX < leftx + buttonwidth && mouseY > topy && mouseY < topy + 20 ) {
              foundLocation = true;
              //if ( i != currindex ) { controller.swapFilters(i, currindex); }
              controller.swapFilters(i, currindex);
            }
          }
-         if ( !foundLocation ) { 
-           fbut.setPosition((distance*0.07) + 30 + currindex*distance,(int)(height*0.85));
+         if ( !foundLocation ) {
+           if ( currindex <= controller.filters.length/2 )  {
+              fbut.setPosition((distance*0.07) + 30 + currindex*distance ,(int)(height*0.85) - 35);
+            } else {
+              fbut.setPosition((distance*0.07) + 30 + (currindex - 1 - controller.filters.length/2 )*distance ,(int)(height*0.85));
+            }
+         //if ( !foundLocation ) { 
+         //  fbut.setPosition((distance*0.07) + 30 + currindex*distance,(int)(height*0.85));
          }
        }
      };
@@ -171,13 +184,18 @@ void setup() {
      for( int i = 0 ; i < controller.filters.length ; i++ ) {
        controller.filters[i].linkButton(
          cp5.addButton(controller.filters[i].getDisplayName())
-           .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.85))
+           //.setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.85))
            .setSize(buttonwidth,20)
            .onDrag(ondrag)
            .onEndDrag(ondragend)
            .onClick(onclickfilt)
            .setColorBackground( filtOnCol )
            .onRelease(onreleasefilt));
+        if ( i <= controller.filters.length/2 )  {
+          controller.filters[i].fbutton.setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.85) - 35);
+        } else {
+          controller.filters[i].fbutton.setPosition((distance*0.07) + 30 + (i - 1 - controller.filters.length/2 )*distance ,(int)(height*0.85));
+        }
      }
   // reposition the Label for controller 'slider'
   //cp5.getController("slider").getValueLabel().align(ControlP5.CENTER, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);
@@ -190,17 +208,21 @@ void draw() {
     update();
   }
   background(backgroundcol); 
-  int distance = (width - 60)/controller.filters.length;
+  int distance = (width - 60)/(controller.filters.length/2 +1);
   int buttonwidth = (int)(distance*0.85);
   for( int i = 0 ; i < controller.filters.length ; i++ ) {
-         fill(128);
-         stroke(100);
-         rect((distance*0.07) + 28 + i*distance,(height * 0.85) - 2, buttonwidth + 4, 24);
+     fill(128);
+     stroke(100);
+     if ( i <= controller.filters.length/2 )  {
+       rect((distance*0.07) + 28 + i*distance ,(int)(height*0.85) - 37, buttonwidth + 4, 24 );
+     } else {
+       rect((distance*0.07) + 28 + (i - 1 - controller.filters.length/2 )*distance,(height * 0.85) - 2, buttonwidth + 4, 24);
+     }
   }
 }
 
 void update() {
-  int distance = (width - 60)/controller.filters.length;
+  int distance = (width - 60)/(controller.filters.length/2 + 1);
   int buttonwidth = (int)(distance*0.85);
   for( int i = 0 ; i < controller.filters.length ; i++ ) {
     color fcol;
@@ -210,8 +232,12 @@ void update() {
       fcol = filtOffCol; 
     }
     controller.filters[i].fbutton
-     .setColorBackground(fcol)
-     .setPosition((distance*0.07) + 30 + i*distance,(int)(height*0.85));
+     .setColorBackground(fcol);
+     if ( i <= controller.filters.length/2 )  {
+        controller.filters[i].fbutton.setPosition((distance*0.07) + 30 + i*distance ,(int)(height*0.85) - 35);
+      } else {
+        controller.filters[i].fbutton.setPosition((distance*0.07) + 30 + (i - 1 - controller.filters.length/2 )*distance ,(int)(height*0.85));
+      }
   }
   updateForControlView = false;   
 }
